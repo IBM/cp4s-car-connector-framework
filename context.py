@@ -13,14 +13,13 @@ def create_logger(debug = False):
 
 
 class Context(object):
-    def __init__(self, args, source):
+    def __init__(self, args):
         global global_context
         global_context = self
 
         from car_framework.car_service import CarService
         from car_framework.communicator import Communicator
         self.args = args
-        self.source = source
         self.logger = create_logger(args.debug)
         self.car_service = CarService(Communicator())
         

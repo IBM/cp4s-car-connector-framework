@@ -29,7 +29,7 @@ class CarService(object):
 
 
     def get_model_state_id(self):
-        url = '%s/source/%s/graph' % (self.car_url, urllib.parse.quote_plus(context().source))
+        url = '%s/source/%s/graph' % (self.car_url, urllib.parse.quote_plus(context().args.source))
         resp = self.communicator.get(url)
         if resp.status_code != 200:
             return None
@@ -39,7 +39,7 @@ class CarService(object):
 
     def save_model_state_id(self, new_model_state_id):
         data = json.dumps({ MODEL_STATE_ID: new_model_state_id })
-        resp = self.communicator.patch(self.car_url + SOURCE_RESOURCE, data=data, params={ 'key': context().source })
+        resp = self.communicator.patch(self.car_url + SOURCE_RESOURCE, data=data, params={ 'key': context().args.source })
         if resp.status_code != 200:
             raise Exception('Error when trying to save a save point: %d' % resp.status_code)
 
@@ -115,7 +115,13 @@ class CarService(object):
         
 
     def delete(self, resource, ids):
-        url = '%s/source/%s/%s?external_ids=%s' % (self.car_url, context().source, resource, ids)
+        # report and source not mentioned anywhere coz connectors aren't allowed to delete it
+        key_based = ["ipaddress", "hostname", "macaddress"]
+        external_id_based = ["asset", "container", "user", "account", "application", "database", "port", "vulnerability", "geolocation"]
+        if resource in key_based:
+            url = '%s/source/%s/%s?external_ids=%s' % (self.car_url, context().args.source, resource, ids)
+        elif resource in external_id_based:
+            url = '%s/source/%s/%s?external_ids=%s' % (self.car_url, context().args.source, resource, ids)
         r = self.communicator.delete(url)
         return r.status_code
 
@@ -180,13 +186,13 @@ class CarService(object):
 
 
     def enter_full_import_in_progress_state(self):
-        endpoint = '%s/source/%s%s' % (self.car_url, context().source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
+        endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.post(endpoint)
         return r.status_code
 
 
     def exit_full_import_in_progress_state(self):
-        endpoint = '%s/source/%s%s' % (self.car_url, context().source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
+        endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.delete(endpoint)
         return r.status_code
 
