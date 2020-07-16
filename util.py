@@ -5,7 +5,7 @@ BATCH_SIZE = 20
 
 
 def recoverable_failure_status_code(status_code):
-    return status_code in (401, 403, 408, 503, 504)
+    return status_code in (302, 400, 401, 403, 408, 500, 503, 504)
 
 
 def check_for_error(status):

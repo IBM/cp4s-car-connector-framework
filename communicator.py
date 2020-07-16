@@ -23,7 +23,7 @@ class Communicator(object):
 
     def send_request(self, req, func, url, **args):
         try:
-            resp = func(url, auth=HTTPBasicAuth(self.api_key, self.password), headers=self.headers, **args)
+            resp = func(url, auth=HTTPBasicAuth(self.api_key, self.password), allow_redirects=False, headers=self.headers, **args)
             context().logger.debug('%s %s, status code: %d, response data: %s' % (req, url, resp.status_code, get_json(resp)))
             if resp.status_code != 200:
                 context().logger.warn('%s %s, status code: %d, response data: %s' % (req, url, resp.status_code, get_json(resp)))
