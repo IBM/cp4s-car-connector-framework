@@ -29,7 +29,7 @@ class CarService(object):
 
 
     def get_model_state_id(self):
-        url = '%s/source/%s/graph' % (self.car_url, urllib.parse.quote_plus(context().args.source))
+        url = '%s/source/%s' % (self.car_url, urllib.parse.quote_plus(context().args.source))
         resp = self.communicator.get(url)
         if resp.status_code != 200:
             return None
