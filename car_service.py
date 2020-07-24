@@ -34,7 +34,7 @@ class CarService(object):
         if resp.status_code != 200:
             return None
         json_data = resp.json()
-        return json_data.get('result') and json_data.get('result').get(MODEL_STATE_ID)
+        return json_data and json_data.get(MODEL_STATE_ID)
 
 
     def save_model_state_id(self, new_model_state_id):
