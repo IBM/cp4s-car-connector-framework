@@ -2,7 +2,7 @@ import requests, json, urllib
 from enum import Enum
 from car_framework.util import get_json, ImportJobStatus, recoverable_failure_status_code, RecoverableFailure, UnrecoverableFailure
 from car_framework.context import context
-
+import time
 
 IMPORT_RESOURCE = '/imports'
 STATUS_RESOURCE = '/importstatus'
@@ -93,7 +93,7 @@ class CarService(object):
                     incomplete = data['incomplete_imports']
                     if incomplete:
                         print('The following imports are still in progress:')
-                        incomplete_ids = map(lambda item: item['id'], incomplete)
+                        incomplete_ids = list(map(lambda item: item['id'], incomplete))
                         for id in incomplete_ids:
                             print('id: %s' % id)
 
