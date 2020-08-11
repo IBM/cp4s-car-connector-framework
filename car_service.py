@@ -188,11 +188,15 @@ class CarService(object):
     def enter_full_import_in_progress_state(self):
         endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.post(endpoint)
+        job_id = get_json(r)['job_id']
+        self.wait_until_done(job_id)
         return r.status_code
 
 
     def exit_full_import_in_progress_state(self):
         endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.delete(endpoint)
+        job_id = get_json(r)['job_id']
+        self.wait_until_done(job_id)
         return r.status_code
 
