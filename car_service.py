@@ -2,7 +2,7 @@ import requests, json, urllib
 from enum import Enum
 from car_framework.util import get_json, ImportJobStatus, recoverable_failure_status_code, RecoverableFailure, UnrecoverableFailure
 from car_framework.context import context
-
+import time
 
 IMPORT_RESOURCE = '/imports'
 STATUS_RESOURCE = '/importstatus'
@@ -29,12 +29,12 @@ class CarService(object):
 
 
     def get_model_state_id(self):
-        url = '%s/source/%s/graph' % (self.car_url, urllib.parse.quote_plus(context().args.source))
+        url = '%s/source/%s' % (self.car_url, urllib.parse.quote_plus(context().args.source))
         resp = self.communicator.get(url)
         if resp.status_code != 200:
             return None
         json_data = resp.json()
-        return json_data.get('result') and json_data.get('result').get(MODEL_STATE_ID)
+        return json_data and json_data.get(MODEL_STATE_ID)
 
 
     def save_model_state_id(self, new_model_state_id):
@@ -93,7 +93,7 @@ class CarService(object):
                     incomplete = data['incomplete_imports']
                     if incomplete:
                         print('The following imports are still in progress:')
-                        incomplete_ids = map(lambda item: item['id'], incomplete)
+                        incomplete_ids = list(map(lambda item: item['id'], incomplete))
                         for id in incomplete_ids:
                             print('id: %s' % id)
 
@@ -188,11 +188,15 @@ class CarService(object):
     def enter_full_import_in_progress_state(self):
         endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.post(endpoint)
+        job_id = get_json(r)['job_id']
+        self.wait_until_done(job_id)
         return r.status_code
 
 
     def exit_full_import_in_progress_state(self):
         endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.delete(endpoint)
+        job_id = get_json(r)['job_id']
+        self.wait_until_done(job_id)
         return r.status_code
 
