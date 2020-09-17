@@ -216,7 +216,7 @@ class CarService(object):
             'external_id': tags['resource_id'],
         }
 
-        r = self.communicator.send_patch_request(self.car_url + resource_type, data=query_expression,
+        r = self.communicator.patch(self.car_url + resource_type, data=query_expression,
                                                     params=param)
 
         if r.status_code == 200:
@@ -235,7 +235,7 @@ class CarService(object):
             'from': edge_id['from'],
             'to': edge_id['to']
         }
-        r = self.communicator.send_patch_request(self.car_url + resource_type, data=query_expression, params=param)
+        r = self.communicator.patch(self.car_url + resource_type, data=query_expression, params=param)
 
         if r.status_code == 200:
             return get_json(r)
