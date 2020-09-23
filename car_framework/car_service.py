@@ -227,7 +227,7 @@ class CarService(object):
             raise UnrecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
  
     
-    def edge_disable(self, source, edge_id, data):
+    def edge_patch(self, source, edge_id, data):
         query_expression = json.dumps(data).encode("utf-8")
         resource_type = "/{resource}".format(resource=edge_id['edge_type'])
         param = {
@@ -240,9 +240,9 @@ class CarService(object):
         if r.status_code == 200:
             return get_json(r)
         elif recoverable_failure_status_code(r.status_code):
-            raise RecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+            raise RecoverableFailure('Error occurred while updating edge: %d' % r.status_code)
         else:
-            raise UnrecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+            raise UnrecoverableFailure('Error occurred while updating edge: %d' % r.status_code)
             
 
     def wait_until_done(self, job_id):
