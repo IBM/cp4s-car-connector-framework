@@ -1,5 +1,7 @@
 ## Publish to pypi
 
+https://packaging.python.org/tutorials/packaging-projects/
+
 Change version in setup.py file (increment)
 Run the following commands once:
 `python3 -m pip install --user --upgrade setuptools wheel`
@@ -10,3 +12,7 @@ Run distribution build:
 `python3 setup.py sdist bdist_wheel`
 Uploading the distribution archives:
 `python3 -m twine upload -u "__token__" -p "<TOKEN>" --repository testpypi dist/*`
+
+
+Test a project using this module by:# 
+pip install -i https://test.pypi.org/simple/ car-connector-framework==0.0.11
