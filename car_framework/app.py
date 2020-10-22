@@ -45,5 +45,5 @@ class BaseApp(object):
         except Exception as e:
             context().logger.exception(e)
             context().logger.error(traceback.format_exc())
-            traceback.print_exc()
+            # traceback.print_exc()
             sys.exit(1)

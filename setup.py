@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="car-connector-framework",
-    version="0.0.11",
+    version="0.0.13",
     author="IBM",
     author_email="",
     description="CAR service connector framework",
@@ -22,5 +22,6 @@ setuptools.setup(
     install_requires=[
         'requests>=2.24.0', # This is for prod pypi
         # 'requests', # This is for test pypi
+        'python-json-logger==0.1.9',
     ]
 )

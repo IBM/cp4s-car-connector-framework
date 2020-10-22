@@ -12,6 +12,8 @@ Run distribution build:
 `python3 setup.py sdist bdist_wheel`
 Uploading the distribution archives:
 `python3 -m twine upload -u "__token__" -p "<TOKEN>" --repository testpypi dist/*`
+OR if you have ~/.pypirc setup
+`python3 -m twine upload --repository testpypi dist/*`
 
 
 Test a project using this module by:# 

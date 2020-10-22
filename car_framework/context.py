@@ -1,4 +1,23 @@
 import logging
+from pythonjsonlogger import jsonlogger
+from datetime import datetime
+
+class CustomJsonFormatter(jsonlogger.JsonFormatter):
+    def add_fields(self, log_record, record, message_dict):
+        # use inherited constructor
+        super(CustomJsonFormatter, self).add_fields(
+            log_record, record, message_dict)
+        if not log_record.get('ibm_datetime'):
+            now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            log_record['ibm_datetime'] = now
+
+        # assign values to log_record
+        log_record['level'] = log_record['level'].lower(
+        ) if log_record.get('level') else record.levelname
+        log_record['message'] = log_record['message'] if log_record.get(
+            'log') else record.message
+        log_record['label'] = log_record['label'] if log_record.get(
+            'type') else record.name
 
 def create_logger(debug = False):
     logger = logging.getLogger()
@@ -6,7 +25,8 @@ def create_logger(debug = False):
 
     handler = logging.StreamHandler()
     handler.setLevel(debug and logging.DEBUG or logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    format_string = '(ibm_datetime) (level) (label) (message)'
+    formatter = CustomJsonFormatter(format_string)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
