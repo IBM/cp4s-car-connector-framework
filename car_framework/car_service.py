@@ -9,6 +9,7 @@ STATUS_RESOURCE = '/importstatus'
 DATABASE_RESOURCE = '/databases'
 JOBSTATUS_RESOURCE = '/jobstatus'
 SOURCE_RESOURCE = '/source'
+GRAPH_SEARCH = '/graph'
 
 FULL_IMPORT_IN_PROGRESS_ENDPOINT = '/full-import-in-progress'
 MODEL_STATE_ID = 'model_state_id'
@@ -171,6 +172,78 @@ class CarService(object):
         else:
             raise UnrecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % status_code)
 
+
+    def graph_search(self, resource, search_id, source=""):
+        external_id = urllib.parse.quote_plus(search_id)
+
+        url = '%s/%s/%s%s' % (self.car_url, resource, external_id, GRAPH_SEARCH)
+        r = {}
+        if source == "":
+            r = self.communicator.get(url)
+        else:
+            r = self.communicator.get(url, params={'source': source})
+
+        if r.status_code == 200:
+            return get_json(r)
+        elif recoverable_failure_status_code(r.status_code):
+            raise RecoverableFailure('Error occurred while searching collection: %d' % r.status_code)
+        else:
+            raise UnrecoverableFailure('Error occurred while searching collection: %d' % r.status_code)
+            
+
+    def graph_attribute_search(self, resource, attribute, search_id):
+        external_id = urllib.parse.quote_plus(search_id)
+        url = '%s/%s?%s=%s' % (self.car_url, resource, attribute, external_id)
+        r = self.communicator.get(url)
+        if r.status_code == 200:
+            return get_json(r)
+        elif recoverable_failure_status_code(r.status_code):
+            raise RecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+        else:
+            raise UnrecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+
+
+    def database_patch_value(self, tags):
+        data = dict()
+        if 'name' in tags:
+            data.update({'name': tags['name']})
+        elif 'pending_update' in tags:
+            data.update({'pending_update': tags['pending_update']})
+
+        query_expression = json.dumps(data).encode("utf-8")
+        resource_type = "/{resource}".format(resource=tags['resource_type'])
+        param = {
+            'external_id': tags['resource_id'],
+        }
+
+        r = self.communicator.patch(self.car_url + resource_type, data=query_expression,
+                                                    params=param)
+
+        if r.status_code == 200:
+            return get_json(r)
+        elif recoverable_failure_status_code(r.status_code):
+            raise RecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+        else:
+            raise UnrecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+ 
+    
+    def edge_patch(self, source, edge_id, data):
+        query_expression = json.dumps(data).encode("utf-8")
+        resource_type = "/{resource}".format(resource=edge_id['edge_type'])
+        param = {
+            'source': source,
+            'from': edge_id['from'],
+            'to': edge_id['to']
+        }
+        r = self.communicator.patch(self.car_url + resource_type, data=query_expression, params=param)
+
+        if r.status_code == 200:
+            return get_json(r)
+        elif recoverable_failure_status_code(r.status_code):
+            raise RecoverableFailure('Error occurred while updating edge: %d' % r.status_code)
+        else:
+            raise UnrecoverableFailure('Error occurred while updating edge: %d' % r.status_code)
+            
 
     def wait_until_done(self, job_id):
         while True:

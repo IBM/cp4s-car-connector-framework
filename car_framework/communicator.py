@@ -26,7 +26,8 @@ class Communicator(object):
             resp = func(url, auth=HTTPBasicAuth(self.api_key, self.password), allow_redirects=False, headers=self.headers, **args)
             context().logger.debug('%s %s, status code: %d, response data: %s' % (req, url, resp.status_code, get_json(resp)))
             if resp.status_code != 200:
-                context().logger.warn('%s %s, status code: %d, response data: %s' % (req, url, resp.status_code, get_json(resp)))
+                context().logger.warn('%s %s, status code: %d, response data: %s, request params: %s, request data: %s' % (req, 
+                    url, resp.status_code, get_json(resp), args.get('params'), args.get('data')))
             return resp
         except (ConnectionError, ConnectTimeout) as e:
             context().logger.error('Error while sending %s request: %s' % (req, str(e)))
