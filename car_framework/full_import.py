@@ -43,7 +43,7 @@ class BaseFullImport(BaseImport):
     def complete(self):
         context().car_service.exit_full_import_in_progress_state()
         self.save_new_model_state_id(self.new_model_state_id)
-        print('Done.')
+        context().logger.info('Done.')
 
 
     def run(self):

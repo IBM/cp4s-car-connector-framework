@@ -93,10 +93,10 @@ class CarService(object):
                 if 'incomplete_imports' in data:
                     incomplete = data['incomplete_imports']
                     if incomplete:
-                        print('The following imports are still in progress:')
+                        context().logger.info('The following imports are still in progress:')
                         incomplete_ids = list(map(lambda item: item['id'], incomplete))
                         for id in incomplete_ids:
-                            print('id: %s' % id)
+                            context().logger.info('id: %s' % id)
 
                 done = filter(lambda id: id not in incomplete_ids, list(jobs_to_check.keys()))
                 for id in done:
