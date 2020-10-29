@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.0.15] - 2020-10-28
+## [0.0.16] - 2020-10-28
 ### Added
 ### Changed
 - Fixed DELETE endpoint, pagination 

@@ -19,4 +19,4 @@ OR if you have ~/.pypirc setup
 
 
 Test a project using this module by:# 
-pip install -i https://test.pypi.org/simple/ car-connector-framework==0.0.11
+pip install -i https://test.pypi.org/simple/ car-connector-framework==0.0.xx
