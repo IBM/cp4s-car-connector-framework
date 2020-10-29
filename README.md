@@ -1,6 +1,6 @@
 # Car Connector Framework
 
-Use `car-reference-connector` project as an example of how this framework is to be used.
+Use [car-reference-connector](https://github.com/IBM/cp4s-car-reference-connector) project as an example of how this framework is to be used.
 
 A CAR connector project will need to extend the framework classes: BaseFullImport, BaseIncrementalImport, BaseApp and implement abstract methods of those classes.
 
