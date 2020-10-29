@@ -1,6 +1,6 @@
 from car_framework.base_import import BaseImport
 from car_framework.context import context
-from car_framework.util import IncrementalImportNotPossible
+from car_framework.util import IncrementalImportNotPossible, RecoverableFailure
 from car_framework.car_service import CarDbStatus
 
 

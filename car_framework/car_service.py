@@ -119,13 +119,26 @@ class CarService(object):
         # report and source not mentioned anywhere coz connectors aren't allowed to delete it
         key_based = ["ipaddress", "hostname", "macaddress"]
         external_id_based = ["asset", "container", "user", "account", "application", "database", "port", "vulnerability", "geolocation"]
+        
         if resource in key_based:
-            url = '%s/source/%s/%s?external_ids=%s' % (self.car_url, context().args.source, resource, ids)
+            resource_key = 'keys'
         elif resource in external_id_based:
-            url = '%s/source/%s/%s?external_ids=%s' % (self.car_url, context().args.source, resource, ids)
-        r = self.communicator.delete(url)
-        return r.status_code
+            resource_key = 'external_ids'
+        else:
+            raise UnrecoverableFailure("Resourse '%s' is not supported for deletion." % resource)
 
+        ids_list = self.compose_paginated_list(ids)
+        for page in ids_list:
+
+            url = '%s/source/%s/%s?%s=%s' % (self.car_url, context().args.source, resource, resource_key, ','.join(ids_list[page]))
+            r = self.communicator.delete(url)
+
+            if r.status_code == 200:
+                continue
+            elif recoverable_failure_status_code(r.status_code):
+                raise RecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % r.status_code)
+            else:
+                raise UnrecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % r.status_code)
 
     def get_db_status(self):
         db_url = self.car_url + DATABASE_RESOURCE
@@ -273,3 +286,18 @@ class CarService(object):
         self.wait_until_done(job_id)
         return r.status_code
 
+    def compose_paginated_list(self, ids):
+        output = {}
+        page = 1
+        limit = 1800
+        length = 0
+        for id in ids:
+            length += len(id)
+            if (length > (limit * page)):
+                page += 1
+
+            if not output.get(page):
+                output[page] = []
+            output[page].append(id)
+
+        return output
