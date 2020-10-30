@@ -26,11 +26,10 @@ class CarService(object):
 
     def __init__(self, communicator):
         self.communicator = communicator
-        self.car_url = context().args.car_service
 
 
     def get_model_state_id(self):
-        url = '%s/source/%s' % (self.car_url, urllib.parse.quote_plus(context().args.source))
+        url = 'source/%s' % (urllib.parse.quote_plus(context().args.source))
         resp = self.communicator.get(url)
         if resp.status_code != 200:
             return None
@@ -40,7 +39,7 @@ class CarService(object):
 
     def save_model_state_id(self, new_model_state_id):
         data = json.dumps({ MODEL_STATE_ID: new_model_state_id })
-        resp = self.communicator.patch(self.car_url + SOURCE_RESOURCE, data=data, params={ 'key': context().args.source })
+        resp = self.communicator.patch(SOURCE_RESOURCE, data=data, params={ 'key': context().args.source })
         if resp.status_code != 200:
             raise Exception('Error when trying to save a save point: %d' % resp.status_code)
 
@@ -53,7 +52,7 @@ class CarService(object):
         status = ImportJobStatus()
         try:
             json_data = json.dumps(data)
-            resp = self.communicator.post(self.car_url + IMPORT_RESOURCE, data=json_data)
+            resp = self.communicator.post(IMPORT_RESOURCE, data=json_data)
             status.status_code = resp.status_code
             json_resp = get_json(resp)
             if 'id' in json_resp:
@@ -73,13 +72,13 @@ class CarService(object):
     def check_import_status(self, statuses):
         # for IN_PROGRESS statuses create a map: id -> status
         jobs_to_check = dict(map(lambda s: (s.job_id, s), filter(lambda s: s.status is ImportJobStatus.IN_PROGRESS, statuses)))
-        
+
         wait_time = 1
         try:
             while True:
                 if not jobs_to_check: return
                 params = ','.join(jobs_to_check.keys())
-                resp = self.communicator.get(self.car_url + STATUS_RESOURCE, params={'ids': params})
+                resp = self.communicator.get(STATUS_RESOURCE, params={'ids': params})
                 data = get_json(resp)
                 if 'error_imports' in data:
                     for err in data['error_imports']:
@@ -113,13 +112,13 @@ class CarService(object):
             for s in jobs_to_check.values():
                 s.status = ImportJobStatus.FAILURE
                 s.error = str(e)
-        
+
 
     def delete(self, resource, ids):
         # report and source not mentioned anywhere coz connectors aren't allowed to delete it
         key_based = ["ipaddress", "hostname", "macaddress"]
         external_id_based = ["asset", "container", "user", "account", "application", "database", "port", "vulnerability", "geolocation"]
-        
+
         if resource in key_based:
             resource_key = 'keys'
         elif resource in external_id_based:
@@ -130,7 +129,7 @@ class CarService(object):
         ids_list = self.compose_paginated_list(ids)
         for page in ids_list:
 
-            url = '%s/source/%s/%s?%s=%s' % (self.car_url, context().args.source, resource, resource_key, ','.join(ids_list[page]))
+            url = 'source/%s/%s?%s=%s' % (context().args.source, resource, resource_key, ','.join(ids_list[page]))
             r = self.communicator.delete(url)
 
             if r.status_code == 200:
@@ -141,10 +140,10 @@ class CarService(object):
                 raise UnrecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % r.status_code)
 
     def get_db_status(self):
-        db_url = self.car_url + DATABASE_RESOURCE
+        db_url = DATABASE_RESOURCE
         r = self.communicator.get(db_url)
         status_code = r.status_code
-        
+
         if status_code == 400:
             # the database is not setup yet, create it
             r = self.communicator.post(db_url)
@@ -154,7 +153,7 @@ class CarService(object):
                 return CarDbStatus.NEWLY_CREATED
             else:
                 return CarDbStatus.FAILURE
-        
+
         elif status_code == 200:
             r_json = get_json(r)
             databases = r_json['databases']
@@ -179,7 +178,7 @@ class CarService(object):
                     return CarDbStatus.NEWLY_CREATED
                 else:
                     return CarDbStatus.FAILURE
-        
+
         elif recoverable_failure_status_code(status_code):
             raise RecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % status_code)
         else:
@@ -189,7 +188,7 @@ class CarService(object):
     def graph_search(self, resource, search_id, source=""):
         external_id = urllib.parse.quote_plus(search_id)
 
-        url = '%s/%s/%s%s' % (self.car_url, resource, external_id, GRAPH_SEARCH)
+        url = '%s/%s%s' % (resource, external_id, GRAPH_SEARCH)
         r = {}
         if source == "":
             r = self.communicator.get(url)
@@ -202,11 +201,11 @@ class CarService(object):
             raise RecoverableFailure('Error occurred while searching collection: %d' % r.status_code)
         else:
             raise UnrecoverableFailure('Error occurred while searching collection: %d' % r.status_code)
-            
+
 
     def graph_attribute_search(self, resource, attribute, search_id):
         external_id = urllib.parse.quote_plus(search_id)
-        url = '%s/%s?%s=%s' % (self.car_url, resource, attribute, external_id)
+        url = '%s?%s=%s' % (resource, attribute, external_id)
         r = self.communicator.get(url)
         if r.status_code == 200:
             return get_json(r)
@@ -229,7 +228,7 @@ class CarService(object):
             'external_id': tags['resource_id'],
         }
 
-        r = self.communicator.patch(self.car_url + resource_type, data=query_expression,
+        r = self.communicator.patch(resource_type, data=query_expression,
                                                     params=param)
 
         if r.status_code == 200:
@@ -238,8 +237,8 @@ class CarService(object):
             raise RecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
         else:
             raise UnrecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
- 
-    
+
+
     def edge_patch(self, source, edge_id, data):
         query_expression = json.dumps(data).encode("utf-8")
         resource_type = "/{resource}".format(resource=edge_id['edge_type'])
@@ -248,7 +247,7 @@ class CarService(object):
             'from': edge_id['from'],
             'to': edge_id['to']
         }
-        r = self.communicator.patch(self.car_url + resource_type, data=query_expression, params=param)
+        r = self.communicator.patch(resource_type, data=query_expression, params=param)
 
         if r.status_code == 200:
             return get_json(r)
@@ -256,11 +255,11 @@ class CarService(object):
             raise RecoverableFailure('Error occurred while updating edge: %d' % r.status_code)
         else:
             raise UnrecoverableFailure('Error occurred while updating edge: %d' % r.status_code)
-            
+
 
     def wait_until_done(self, job_id):
         while True:
-            r = self.communicator.get(self.car_url + JOBSTATUS_RESOURCE + '/{}'.format(job_id))
+            r = self.communicator.get(JOBSTATUS_RESOURCE + '/{}'.format(job_id))
             if r.status_code == 200:
                 status = get_json(r)['status']
                 if status == 'COMPLETE':
@@ -272,7 +271,7 @@ class CarService(object):
 
 
     def enter_full_import_in_progress_state(self):
-        endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
+        endpoint = 'source/%s%s' % (context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.post(endpoint)
         job_id = get_json(r)['job_id']
         self.wait_until_done(job_id)
@@ -280,7 +279,7 @@ class CarService(object):
 
 
     def exit_full_import_in_progress_state(self):
-        endpoint = '%s/source/%s%s' % (self.car_url, context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
+        endpoint = 'source/%s%s' % (context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.delete(endpoint)
         job_id = get_json(r)['job_id']
         self.wait_until_done(job_id)
