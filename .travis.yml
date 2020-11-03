@@ -5,11 +5,11 @@ python:
   - "3.6"
 
 install:
-  - echo "Ignoring Travis default pip install, will manually install in travis-script.sh"
+  - echo "Starting Travis run"
 
 before_script:
-  - bash ./scripts/run_unit_tests.sh
+  - bash ./run_unit_tests.sh
 
 script:
-  - bash ./scripts/publish.sh
+  - bash ./publish.sh
 
