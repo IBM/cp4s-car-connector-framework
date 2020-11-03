@@ -1,4 +1,6 @@
 language: python
+os:
+  - linux
 python:
   - "3.6"
 
@@ -6,11 +8,8 @@ install:
   - echo "Ignoring Travis default pip install, will manually install in travis-script.sh"
 
 before_script:
-  - "pip install -r requirements.txt"
-  # - bash ./scripts/run_unit_tests.sh
+  - bash ./scripts/run_unit_tests.sh
 
 script:
-  - bash ./travis-script.sh
+  - bash ./scripts/publish.sh
 
-after_script:
-  - bash ./teardown.sh
