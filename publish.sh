@@ -2,7 +2,8 @@ LOG_PREFIX=`basename "$0"`
 
 function log()
 {
-   echo -e "\e[92m" $(date -u) "[$LOG_PREFIX]: $1"
+    printf "\x1b[38;2;255;100;0m$(date -u) "[$LOG_PREFIX]: $1"\x1b[0m\n"
+    echo -e "\e[92m"$(date -u) "[$LOG_PREFIX]: $1"
 }
 
 log "START PUBLISHING"
@@ -37,17 +38,6 @@ else
     export PYPI_PACKAGE_VERSION=${TRAVIS_TAG}
 fi
 
-# log "TRAVIS_TAG: ${TRAVIS_TAG}"
-# log "TRAVIS_BRANCH: ${TRAVIS_BRANCH}"
-# log "TRAVIS_PULL_REQUEST_BRANCH: ${TRAVIS_PULL_REQUEST_BRANCH}"
-# log "PYPI_PACKAGE_VERSION: ${PYPI_PACKAGE_VERSION}"
-
-# PYPI_API_REPOSITORY_PROD
-# PYPI_API_REPOSITORY_TEST
-# PYPI_API_TOKEN_PROD
-# PYPI_API_TOKEN_TEST 
-
-env
 
 if [ "${TO_PUBLISH}" == "true" ] ; then
     log "TO_PUBLISH is true"
