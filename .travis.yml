@@ -4,6 +4,11 @@ os:
 python:
   - "3.6"
 
+addons:
+  apt:
+    packages:
+      - expect-dev # for unbuffer
+
 install:
   - echo "Starting Travis"
 
@@ -11,5 +16,5 @@ before_script:
   - bash ./run_unit_tests.sh
 
 script:
-  - bash ./publish.sh
+  - unbuffer bash ./publish.sh
 

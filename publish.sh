@@ -5,8 +5,9 @@ LOG_PREFIX=`basename "$0"`
 
 function log()
 {
-    printf "\x1b[38;2;255;100;0m$(date -u) [$LOG_PREFIX]: $1"\x1b[0m\n"
-    echo -e "\e[92m"$(date -u) [$LOG_PREFIX]: $1"
+    printf "\x1b[38;2;255;100;0mTRUECOLOR\x1b[0m\n"
+    printf "\x1b[38;2;255;100;0m$(date -u) [$LOG_PREFIX]: $1\x1b[0m\n"
+    echo -e "\e[92m $(date -u) [$LOG_PREFIX]: $1"
 }
 
 log "START PUBLISHING"
