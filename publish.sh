@@ -1,9 +1,12 @@
+#!/bin/bash
+
+
 LOG_PREFIX=`basename "$0"`
 
 function log()
 {
-    printf "\x1b[38;2;255;100;0m$(date -u) "[$LOG_PREFIX]: $1"\x1b[0m\n"
-    echo -e "\e[92m"$(date -u) "[$LOG_PREFIX]: $1"
+    printf "\x1b[38;2;255;100;0m$(date -u) [$LOG_PREFIX]: $1"\x1b[0m\n"
+    echo -e "\e[92m"$(date -u) [$LOG_PREFIX]: $1"
 }
 
 log "START PUBLISHING"
@@ -21,7 +24,7 @@ else
 fi
 
 # choose repository
-if [[ "${EFFECTIVE_BRANCH}" =~ ^(master|develop|test-travis-branch)$ ]]; then
+if [[ "${EFFECTIVE_BRANCH}" =~ ^(master|develop)$ ]]; then
     PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
 else
