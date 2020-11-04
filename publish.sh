@@ -2,7 +2,7 @@ LOG_PREFIX=`basename "$0"`
 
 function log()
 {
-   echo $(date -u) "[$LOG_PREFIX]: $1"
+   echo -e "\e[92m" $(date -u) "[$LOG_PREFIX]: $1"
 }
 
 log "START PUBLISHING"
@@ -14,18 +14,18 @@ fi
 
 # get branch
 if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
-    EFFECTIVE_BRANCH=${TRAVIS_BRANCH}
+    EFFECTIVE_BRANCH="${TRAVIS_BRANCH}"
 else
-    EFFECTIVE_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH}
+    EFFECTIVE_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH}"
 fi
 
 # choose repository
-if [[ "$EFFECTIVE_BRANCH" =~ ^(master|develop)$ ]]; then
-    PYPI_API_REPOSITORY = $PYPI_API_REPOSITORY_PROD
-    PYPI_API_TOKEN = $PYPI_API_TOKEN_PROD
+if [[ "${EFFECTIVE_BRANCH}" =~ ^(master|develop)$ ]]; then
+    PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
+    PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
 else
-    PYPI_API_REPOSITORY = $PYPI_API_REPOSITORY_TEST
-    PYPI_API_TOKEN = $PYPI_API_TOKEN_TEST
+    PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_TEST}"
+    PYPI_API_TOKEN="${PYPI_API_TOKEN_TEST}"
 fi
 
 # export version
