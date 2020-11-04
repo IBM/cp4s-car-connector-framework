@@ -19,8 +19,6 @@ version = os.environ.get('PYPI_PACKAGE_VERSION')
 
 print('PYPI_PACKAGE_VERSION: ' + version)
 
-sys.exit(1)
-
 setuptools.setup(
     name="car-connector-framework",
     version=version,
