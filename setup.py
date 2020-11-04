@@ -17,8 +17,6 @@ install_requires_list = list(install_requires_list)
 
 version = os.environ.get('PYPI_PACKAGE_VERSION')
 
-print('PYPI_PACKAGE_VERSION: ' + version)
-
 setuptools.setup(
     name="car-connector-framework",
     version=version,

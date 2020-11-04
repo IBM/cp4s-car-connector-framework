@@ -58,5 +58,8 @@ if [ "${TO_PUBLISH}" == "true" ] ; then
 
     python setup.py sdist bdist_wheel
 
+    log "${PYPI_API_TOKEN}" 
+    log "${PYPI_API_REPOSITORY}"
+
     python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi
