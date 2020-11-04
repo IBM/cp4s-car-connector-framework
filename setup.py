@@ -17,11 +17,13 @@ install_requires_list = list(install_requires_list)
 
 version = os.environ.get('PYPI_PACKAGE_VERSION')
 
+print('PYPI_PACKAGE_VERSION: ' + version)
+
 sys.exit(1)
 
 setuptools.setup(
     name="car-connector-framework",
-    version="0.0.16",
+    version=version,
     author="IBM",
     author_email="",
     description="CAR service connector framework",
