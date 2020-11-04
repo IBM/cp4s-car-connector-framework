@@ -104,7 +104,7 @@ class TestCarService(unittest.TestCase):
         mocked_send_post.return_value = MockJsonResponse(200, job_id)
         mocked_wait.return_value = CarDbStatus.READY
         full_import_status = context().car_service.enter_full_import_in_progress_state()
-        assert full_import_status is 201
+        assert full_import_status is 200
 
     @staticmethod
     @patch('car_framework.communicator.Communicator.patch')
