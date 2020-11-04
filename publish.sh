@@ -20,7 +20,7 @@ else
 fi
 
 # choose repository
-if [[ "${EFFECTIVE_BRANCH}" =~ ^(master|develop)$ ]]; then
+if [[ "${EFFECTIVE_BRANCH}" =~ ^(master|develop|test-travis-branch)$ ]]; then
     PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
 else
