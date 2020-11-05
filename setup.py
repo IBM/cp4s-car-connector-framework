@@ -2,20 +2,22 @@ import setuptools
 import os
 import sys
 
+version = os.environ.get('PYPI_PACKAGE_VERSION')
+repository = os.environ.get('PYPI_PACKAGE_REPOSITORY')
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 #Prepare requires list
 install_requires_list = set()
-with open('requirements.txt') as f:
+requirements_file = 'requirements-test.txt' if repository == 'test' else 'requirements.txt'
+with open(requirements_file) as f:
     lines = f.readlines()
 lines = [x.strip() for x in lines]
 lines = list(filter(lambda s: (not s.startswith('#')) and len(s)>0, lines))
 lines = list(filter(lambda s: (not s.startswith('git+')) and len(s)>0, lines))
 install_requires_list.update(lines)
 install_requires_list = list(install_requires_list)
-
-version = os.environ.get('PYPI_PACKAGE_VERSION')
 
 setuptools.setup(
     name="car-connector-framework",

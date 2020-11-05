@@ -8,8 +8,6 @@ function log()
     echo -e "\e[32m$(date -u) [$LOG_PREFIX]: $1\e[0m"
 }
 
-log "START PUBLISHING"
-
 if [ -z "${TO_PUBLISH}" ]; then
     TO_PUBLISH="true"
 fi
@@ -26,9 +24,11 @@ fi
 if [[ "${EFFECTIVE_BRANCH}" =~ ^(master|develop)$ ]]; then
     PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
+    export PYPI_PACKAGE_REPOSITORY="prod"
 else
     PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_TEST}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_TEST}"
+    export PYPI_PACKAGE_REPOSITORY="test"
 fi
 
 # export version
@@ -40,18 +40,19 @@ else
     export PYPI_PACKAGE_VERSION=${TRAVIS_TAG}
 fi
 
+log "EFFECTIVE_BRANCH: ${EFFECTIVE_BRANCH}" 
+log "PYPI_API_REPOSITORY: ${PYPI_API_REPOSITORY}"
+log "PYPI_PACKAGE_REPOSITORY: ${PYPI_PACKAGE_REPOSITORY}"
+
 
 if [ "${TO_PUBLISH}" == "true" ] ; then
-    log "TO_PUBLISH is true"
+    log "START PUBLISHING"
 
     pip install setuptools wheel twine
 
     rm -R -f ./build ./dist ./*.egg-info
 
     python setup.py sdist bdist_wheel
-
-    log "${PYPI_API_TOKEN}" 
-    log "${PYPI_API_REPOSITORY}"
 
     python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi
