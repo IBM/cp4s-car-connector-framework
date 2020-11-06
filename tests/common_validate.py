@@ -21,6 +21,8 @@ def context_patch():
         'car_service': 'https://example.com/api/car/v2',
         'api_key': None,
         'api_password': 'abc-xyz',
+        'car_service_token_url': 'abc-xyz',
+        'api_token': 'abc-xyz',
         'source': 'AWS-TEST',
         'debug': False,
         'last_model_state_id': "1580649320000",
