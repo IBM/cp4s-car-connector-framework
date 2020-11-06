@@ -7,9 +7,12 @@ from car_framework.util import IncrementalImportNotPossible, RecoverableFailure,
 class BaseApp(object):
     def __init__(self, description):
         self.parser = argparse.ArgumentParser(description=description)
-        self.parser.add_argument('-car-service-url', dest='car_service', type=str, required=True, help='URL of the CAR ingestion service')
-        self.parser.add_argument('-car-service-key', dest='api_key', type=str, required=True, help='API key for CAR ingestion service')
-        self.parser.add_argument('-car-service-password', dest='api_password', type=str, required=True, help='Password for CAR ingestion service')
+        self.parser.add_argument('-car-service-url', dest='car_service_apikey_url', type=str, required=False, help='URL of the CAR ingestion service if API key is used for authorization')
+        self.parser.add_argument('-car-service-key', dest='api_key', type=str, required=False, help='API key for CAR ingestion service')
+        self.parser.add_argument('-car-service-password', dest='api_password', type=str, required=False, help='Password for CAR ingestion service')
+
+        self.parser.add_argument('-car-service-url-for-token', dest='car_service_token_url', type=str, required=False, help='URL of the CAR ingestion service if Auth token is used for authorization')
+        self.parser.add_argument('-car-service-token', dest='api_token', type=str, required=False, help='Auth token for CAR ingestion service')
 
         # source id to uniquely identify each data source
         self.parser.add_argument('-source', dest='source', type=str, required=True, help='Unique source id for the data source')
@@ -19,6 +22,30 @@ class BaseApp(object):
 
     def setup(self):
         args = self.parser.parse_args()
+
+        if not args.api_token:
+            if not args.api_key or not args.api_password:
+                self.parser.print_usage(sys.stderr)
+                sys.stderr.write('Either -car-service-token or -car-service-key and -car-service-password arguments are required.')
+                sys.exit(2)
+
+        if not args.car_service_apikey_url and not args.car_service_token_url:
+            self.parser.print_usage(sys.stderr)
+            sys.stderr.write('Either -car-service-url or -car-service-url-for-token is required.')
+            sys.exit(2)
+
+        if args.car_service_apikey_url:
+            if not args.api_key or not args.api_password:
+                self.parser.print_usage(sys.stderr)
+                sys.stderr.write('If -car-service-url is provided then -car-service-key and -car-service-password arguments are required.')
+                sys.exit(2)
+
+        if args.car_service_token_url:
+            if not args.api_token:
+                self.parser.print_usage(sys.stderr)
+                sys.stderr.write('If -car-service-url-for-token is provided then -car-service-token argument is required.')
+                sys.exit(2)
+
         Context(args)
 
 

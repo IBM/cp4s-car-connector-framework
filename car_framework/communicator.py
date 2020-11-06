@@ -1,4 +1,4 @@
-import requests
+import requests, os
 from requests.exceptions import ConnectionError, ConnectTimeout
 from requests.auth import HTTPBasicAuth
 from car_framework.util import get_json
@@ -17,34 +17,54 @@ class Response(object):
 class Communicator(object):
     def __init__(self):
         self.headers = {'Accept' : 'application/json', 'Content-Type' : 'application/json'}
-        self.api_key = context().args.api_key
-        self.password = context().args.api_password
+
+        auth_token = context().args.api_token
+        if auth_token:
+            self.headers['Authorization'] = 'car-token ' + auth_token
+            self.base_url = context().args.car_service_token_url
+            self.basic_auth = None
+        else:
+            self.basic_auth = HTTPBasicAuth(context().args.api_key, context().args.api_password)
+            self.base_url = context().args.car_service_apikey_url
+
+        if not self.base_url.endswith('/'):
+            self.base_url = self.base_url + '/'
 
 
-    def send_request(self, req, func, url, **args):
+    def make_url(self, path):
+        if path.startswith('http'):
+            context().logger.warn('A URL is passed in to the Communicator instead of a path: ' + path)
+            return path
+
+        if path.startswith('/'): path = path[1:]
+        return self.base_url + path
+
+
+    def send_request(self, req, func, path, **args):
         try:
-            resp = func(url, auth=HTTPBasicAuth(self.api_key, self.password), allow_redirects=False, headers=self.headers, **args)
+            url = self.make_url(path)
+            resp = func(url, auth=self.basic_auth, allow_redirects=False, headers=self.headers, **args)
             context().logger.debug('%s %s, status code: %d, response data: %s' % (req, url, resp.status_code, get_json(resp)))
             if resp.status_code != 200:
-                context().logger.warn('%s %s, status code: %d, response data: %s, request params: %s, request data: %s' % (req, 
+                context().logger.warn('%s %s, status code: %d, response data: %s, request params: %s, request data: %s' % (req,
                     url, resp.status_code, get_json(resp), args.get('params'), args.get('data')))
             return resp
         except (ConnectionError, ConnectTimeout) as e:
             context().logger.error('Error while sending %s request: %s' % (req, str(e)))
             return Response(503, {'error' : str(e)})
-    
-
-    def post(self, url, **args):
-        return self.send_request('POST', requests.post, url, **args)
 
 
-    def get(self, url, **args):
-        return self.send_request('GET', requests.get, url, **args)
+    def post(self, path, **args):
+        return self.send_request('POST', requests.post, path, **args)
 
 
-    def patch(self, url, **args):
-        return self.send_request('PATCH', requests.patch, url, **args)
+    def get(self, path, **args):
+        return self.send_request('GET', requests.get, path, **args)
 
 
-    def delete(self, url, **args):
-        return self.send_request('DELETE', requests.delete, url, **args)
+    def patch(self, path, **args):
+        return self.send_request('PATCH', requests.patch, path, **args)
+
+
+    def delete(self, path, **args):
+        return self.send_request('DELETE', requests.delete, path, **args)
