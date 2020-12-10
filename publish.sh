@@ -47,7 +47,7 @@ log "PYPI_PACKAGE_REPOSITORY: ${PYPI_PACKAGE_REPOSITORY}"
 if [ "${TO_PUBLISH}" == "true" ] ; then
     log "START PUBLISHING"
 
-    pip install setuptools wheel twine
+    pip install setuptools wheel twine keyring==21.4.0
 
     rm -R -f ./build ./dist ./*.egg-info
 
