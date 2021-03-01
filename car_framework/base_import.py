@@ -7,14 +7,14 @@ class BaseImport(object):
     def __init__(self):
         self.statuses = []
 
+    def create_source_report_object(self):
+        raise NotImplementedError()
+
     def wait_for_completion_of_import_jobs(self):
         context().car_service.check_import_status(self.statuses)
         for status in self.statuses:
             check_for_error(status)
         self.statuses = []
-
-    def create_source_report_object(self):
-        raise NotImplementedError()
 
     def send_data(self, name, data):
         envelope = self.create_source_report_object()
