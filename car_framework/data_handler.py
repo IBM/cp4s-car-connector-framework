@@ -132,7 +132,7 @@ class BaseDataHandler():
         for _, _, files in os.walk(dir_path):
             for data_file in files:
                 with open(os.path.join(dir_path, data_file), 'r') as outfile:
-                    importer.send_data(name, outfile)
+                    importer.send_data_from_file(name, outfile)
         self._delete_cache_dir(dir_path)
 
     def printData(self):

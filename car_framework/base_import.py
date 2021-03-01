@@ -13,7 +13,19 @@ class BaseImport(object):
             check_for_error(status)
         self.statuses = []
 
-    def send_data(self, name, data_file):
+    def create_source_report_object(self):
+        raise NotImplementedError()
+
+    def send_data(self, name, data):
+        envelope = self.create_source_report_object()
+        envelope[name] = data
+        status = context().car_service.import_data(envelope)
+        check_for_error(status)
+        self.statuses.append(status)
+        if len(self.statuses) == BATCH_SIZE:
+            self.wait_for_completion_of_import_jobs()
+
+    def send_data_from_file(self, name, data_file):
         status = context().car_service.import_data_from_file(data_file)
         check_for_error(status)
         self.statuses.append(status)
