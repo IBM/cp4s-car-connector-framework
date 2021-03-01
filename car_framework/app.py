@@ -16,8 +16,10 @@ class BaseApp(object):
 
         # source id to uniquely identify each data source
         self.parser.add_argument('-source', dest='source', type=str, required=True, help='Unique source id for the data source')
-
         self.parser.add_argument('-d', dest='debug', action='store_true', help='Enables DEBUG level logging')
+        self.parser.add_argument('-cache-dir', dest='cache_dir', default='/tmp/connector_cache', help='Cache directory path, deafualt /tmp/connector_cache')
+        self.parser.add_argument('-keep-cache-dir', dest='keep_cache_dir', action='store_true', help='True for not removing cache directory after complete, default false')
+        self.parser.add_argument('-cache-page-size', dest='cache_page_size', type=int, default=200, help='File cache dump page size, default 200')
 
 
     def setup(self):
@@ -62,11 +64,11 @@ class BaseApp(object):
 
         except RecoverableFailure as e:
             context().logger.info('Recoverable failure: ' + e.message)
-            context().logger.info('Incremental import will be attempted again in the nex run.')
+            context().logger.info('Incremental import will be attempted again in the next run.')
             sys.exit(1)
         except UnrecoverableFailure as e:
             context().logger.info('Unrecoverable failure: ' + e.message)
-            context().logger.info('Incremental import will not be possible in the nex run.')
+            context().logger.info('Incremental import will not be possible in the next run.')
             context().car_service.reset_model_state_id()
             sys.exit(1)
         except Exception as e:
