@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.1] - 2021-03-01
 ### Added
 ### Changed
-- Added file cache
+- Added export_data support
 ### Removed
 
 ## [2.0.0] - 2021-01-29
