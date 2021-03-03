@@ -1,6 +1,7 @@
 from datetime import datetime
-import os
 import json
+import os
+import shutil
 import uuid
 
 from car_framework.context import context
@@ -105,18 +106,8 @@ class BaseDataHandler():
 
     def _delete_export_data_dir(self, export_data_dir):
         if not context().args.keep_export_data_dir and os.path.exists(export_data_dir):
-            from pathlib import Path
-
-            def rmdir(directory):
-                context().logger.debug('Delete export_data dir: %s', directory)
-                directory = Path(directory)
-                for item in directory.iterdir():
-                    if item.is_dir():
-                        rmdir(item)
-                    else:
-                        item.unlink()
-                directory.rmdir()
-            rmdir(Path(export_data_dir))
+            context().logger.debug('Delete export_data dir: %s', export_data_dir)
+            shutil.rmtree(export_data_dir)
 
     def _save_export_data_file(self, name, data):
         dir_path = self._create_export_data_dir(name)
