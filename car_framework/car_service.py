@@ -47,7 +47,7 @@ class CarService(object):
     def reset_model_state_id(self):
         self.save_model_state_id('')
 
-
+    # depricated
     def import_data(self, data):
         status = ImportJobStatus()
         try:
@@ -68,6 +68,24 @@ class CarService(object):
             status.error = str(e)
             return status
 
+    def import_data_from_file(self, data_file):
+        status = ImportJobStatus()
+        try:
+            resp = self.communicator.post(IMPORT_RESOURCE, data=data_file)
+            status.status_code = resp.status_code
+            json_resp = get_json(resp)
+            if 'id' in json_resp:
+                status.job_id = json_resp['id']
+                status.status = ImportJobStatus.IN_PROGRESS
+            else:
+                status.status = ImportJobStatus.FAILURE
+                status.error = str(json_resp)
+            return status
+
+        except Exception as e:
+            status.status = ImportJobStatus.FAILURE
+            status.error = str(e)
+            return status
 
     def check_import_status(self, statuses):
         # for IN_PROGRESS statuses create a map: id -> status
