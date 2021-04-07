@@ -135,14 +135,12 @@ class CarService(object):
     def delete(self, resource, ids):
         # report and source not mentioned anywhere coz connectors aren't allowed to delete it
         key_based = ["ipaddress", "hostname", "macaddress"]
-        external_id_based = ["asset", "container", "user", "account", "application", "database", "port", "vulnerability", "geolocation"]
+        # external_id_based native resources are ["asset", "container", "user", "account", "application", "database", "port", "vulnerability", "geolocation"]
 
         if resource in key_based:
             resource_key = 'keys'
-        elif resource in external_id_based:
-            resource_key = 'external_ids'
         else:
-            raise UnrecoverableFailure("Resourse '%s' is not supported for deletion." % resource)
+            resource_key = 'external_ids'
 
         ids_list = self.compose_paginated_list(ids)
         for page in ids_list:
