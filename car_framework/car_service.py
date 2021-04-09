@@ -102,8 +102,8 @@ class CarService(object):
                     for err in data['error_imports']:
                         id = err['id']
                         jobs_to_check[id].status = ImportJobStatus.FAILURE
-                        jobs_to_check[id].error = err.get('error')
-                        jobs_to_check[id].status_code = err.get('statusCode')
+                        jobs_to_check[id].error = err.get('error', err)
+                        jobs_to_check[id].status_code = err.get('statusCode', 0)
                         jobs_to_check.pop(id, None)
 
                 incomplete_ids = []
