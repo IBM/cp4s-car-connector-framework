@@ -59,7 +59,7 @@ class BaseDataHandler():
             objects = []
             self.edges[name] = objects
 
-        keys = self.collection_keys.get(name)
+        keys = self.edge_keys.get(name)
         if not keys:
             keys = []
             self.edge_keys[name] = keys
