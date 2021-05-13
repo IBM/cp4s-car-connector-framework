@@ -307,6 +307,7 @@ class CarService(object):
         limit = 1800
         length = 0
         for id in ids:
+            id = str(id)
             length += len(id)
             if (length > (limit * page)):
                 page += 1
