@@ -18,7 +18,8 @@ class BaseImport(object):
 
     def send_data(self, name, data):
         envelope = self.create_source_report_object()
-        envelope[name] = data
+        if name:
+            envelope[name] = data
         status = context().car_service.import_data(envelope)
         check_for_error(status)
         self.statuses.append(status)

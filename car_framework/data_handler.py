@@ -5,6 +5,7 @@ import shutil
 import uuid
 
 from car_framework.context import context
+from car_framework.full_import import BaseFullImport
 
 
 def get_report_time():
@@ -80,6 +81,8 @@ class BaseDataHandler():
 
     def send_collections(self, importer):
         context().logger.info('Creating vertices')
+        if not self.collections and isinstance(importer, BaseFullImport):
+            self._send_empty_report(importer)
         for name, data in self.collections.items():
             # save residual data
             if len(data) > 0:
@@ -89,12 +92,17 @@ class BaseDataHandler():
 
     def send_edges(self, importer):
         context().logger.info('Creating edges')
+        if not self.edges and isinstance(importer, BaseFullImport):
+            self._send_empty_report(importer)
         for name, data in self.edges.items():
             # save residual data
             if len(data) > 0:
                 self._save_export_data_file(name, data)
             self._send(name, importer)
         context().logger.info('Creating edges done: %s', {key: len(value) for key, value in self.edge_keys.items()})
+
+    def _send_empty_report(self, iporter):
+        iporter.send_data(None, None)
 
     def _create_export_data_dir(self, name):
         dir_path = os.path.join(self.export_data_dir, name)
