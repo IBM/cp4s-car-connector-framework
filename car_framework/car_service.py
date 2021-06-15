@@ -205,11 +205,10 @@ class CarService(object):
         external_id = urllib.parse.quote_plus(search_id)
 
         url = '%s/%s%s' % (resource, external_id, GRAPH_SEARCH)
-        r = {}
         if source == "":
-            r = self.communicator.get(url)
-        else:
-            r = self.communicator.get(url, params={'source': source})
+            source = context().args.source
+
+        r = self.communicator.get(url, params={'source': source})
 
         if r.status_code == 200:
             return get_json(r)
