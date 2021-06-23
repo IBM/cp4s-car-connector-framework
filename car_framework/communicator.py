@@ -1,6 +1,9 @@
 import requests, os
-from requests.exceptions import ConnectionError, ConnectTimeout
+from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.auth import HTTPBasicAuth
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
 from car_framework.util import get_json
 from car_framework.context import context
 
@@ -12,6 +15,18 @@ class Response(object):
 
     def json(self):
         return self.data
+
+
+class CallbackRetry(Retry):
+    def increment(self, method, url, *args, **kwargs):
+        try:
+            self.retry_callback(url, self.get_backoff_time())
+        except Exception:
+            context().logger.info('CallbackRetry raised an exception, ignoring')
+        return super(CallbackRetry, self).increment(method, url, *args, **kwargs)
+
+    def retry_callback(self, url, backoff_time):
+        context().logger.info('Retry after %s sec invoked with url %s' % (backoff_time, url))
 
 
 class Communicator(object):
@@ -29,6 +44,19 @@ class Communicator(object):
 
         if not self.base_url.endswith('/'):
             self.base_url = self.base_url + '/'
+
+        retry_strategy = CallbackRetry(
+            total=3,
+            backoff_factor=10,
+            raise_on_status=False,
+            status_forcelist=[403, 429, 503],
+            method_whitelist=["HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS", "TRACE"]
+        )
+
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.http = requests.Session()
+        self.http.mount("https://", adapter)
+        self.http.mount("http://", adapter)
 
 
     def make_url(self, path):
@@ -49,22 +77,25 @@ class Communicator(object):
                 context().logger.warn('%s %s, status code: %d, response data: %s, request params: %s, request data: %s' % (req,
                     url, resp.status_code, get_json(resp), args.get('params'), args.get('data')))
             return resp
+        except RetryError as e:
+            context().logger.error('Max retries exceeded error while sending %s request: %s' % (req, str(e)))
+            return Response(503, {'error' : str(e)})
         except (ConnectionError, ConnectTimeout) as e:
             context().logger.error('Error while sending %s request: %s' % (req, str(e)))
             return Response(503, {'error' : str(e)})
 
 
     def post(self, path, **args):
-        return self.send_request('POST', requests.post, path, **args)
+        return self.send_request('POST', self.http.post, path, **args)
 
 
     def get(self, path, **args):
-        return self.send_request('GET', requests.get, path, **args)
+        return self.send_request('GET', self.http.get, path, **args)
 
 
     def patch(self, path, **args):
-        return self.send_request('PATCH', requests.patch, path, **args)
+        return self.send_request('PATCH', self.http.patch, path, **args)
 
 
     def delete(self, path, **args):
-        return self.send_request('DELETE', requests.delete, path, **args)
+        return self.send_request('DELETE', self.http.delete, path, **args)
