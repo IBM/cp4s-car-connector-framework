@@ -19,7 +19,7 @@ class BaseApp(object):
         self.parser.add_argument('-d', dest='debug', action='store_true', help='Enables DEBUG level logging')
         self.parser.add_argument('-export-data-dir', dest='export_data_dir', default='/tmp/car_temp_export_data', help='Export data directory path, deafualt /tmp/car_temp_export_data')
         self.parser.add_argument('-keep-export-data-dir', dest='keep_export_data_dir', action='store_true', help='True for not removing export_data directory after complete, default false')
-        self.parser.add_argument('-export-data-page-size', dest='export_data_page_size', type=int, default=200, help='File export_data dump page size, default 200')
+        self.parser.add_argument('-export-data-page-size', dest='export_data_page_size', type=int, default=2000, help='File export_data dump page size, default 2000')
 
 
     def setup(self):
