@@ -29,6 +29,8 @@ class BaseFullImport(BaseImport):
         db_status = context().car_service.get_db_status()
         if db_status == CarDbStatus.FAILURE:
             raise RecoverableFailure('Database is not ready.')
+        
+        context().car_service.enter_full_import_in_progress_state()
 
         source_report_data = self.create_source_report_object()
         status = context().car_service.import_data(source_report_data)
@@ -36,7 +38,6 @@ class BaseFullImport(BaseImport):
 
         self.statuses.append(status)
         self.wait_for_completion_of_import_jobs()
-        context().car_service.enter_full_import_in_progress_state()
         self.new_model_state_id = self.get_new_model_state_id()
 
 
