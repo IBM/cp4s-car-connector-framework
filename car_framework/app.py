@@ -1,4 +1,4 @@
-import argparse, traceback, sys
+import argparse, traceback, sys, os
 
 from car_framework.context import Context, context
 from car_framework.util import IncrementalImportNotPossible, RecoverableFailure, UnrecoverableFailure
@@ -7,15 +7,16 @@ from car_framework.util import IncrementalImportNotPossible, RecoverableFailure,
 class BaseApp(object):
     def __init__(self, description):
         self.parser = argparse.ArgumentParser(description=description)
-        self.parser.add_argument('-car-service-url', dest='car_service_apikey_url', type=str, required=False, help='URL of the CAR ingestion service if API key is used for authorization')
-        self.parser.add_argument('-car-service-key', dest='api_key', type=str, required=False, help='API key for CAR ingestion service')
-        self.parser.add_argument('-car-service-password', dest='api_password', type=str, required=False, help='Password for CAR ingestion service')
+        self.parser.add_argument('-car-service-url', dest='car_service_apikey_url', default=os.getenv('CAR_SERVICE_URL',None), type=str, required=False, help='URL of the CAR ingestion service if API key is used for authorization')
+        self.parser.add_argument('-car-service-key', dest='api_key', default=os.getenv('CAR_SERVICE_KEY',None), type=str, required=False, help='API key for CAR ingestion service')
+        self.parser.add_argument('-car-service-password', dest='api_password', default=os.getenv('CAR_SERVICE_PASSWORD',None), type=str, required=False, help='Password for CAR ingestion service')
 
-        self.parser.add_argument('-car-service-url-for-token', dest='car_service_token_url', type=str, required=False, help='URL of the CAR ingestion service if Auth token is used for authorization')
-        self.parser.add_argument('-car-service-token', dest='api_token', type=str, required=False, help='Auth token for CAR ingestion service')
+        self.parser.add_argument('-car-service-url-for-token', dest='car_service_token_url', default=os.getenv('CAR_SERVICE_URL_FOR_AUTHTOKEN',None), type=str, required=False, help='URL of the CAR ingestion service if Auth token is used for authorization')
+        self.parser.add_argument('-car-service-token', dest='api_token', default=os.getenv('CAR_SERVICE_AUTHTOKEN',None), type=str, required=False, help='Auth token for CAR ingestion service')
 
         # source id to uniquely identify each data source
-        self.parser.add_argument('-source', dest='source', type=str, required=True, help='Unique source id for the data source')
+        self.parser.add_argument('-source', dest='source', default=os.getenv('CONNECTION_NAME',None), type=str, required=True, help='Unique source id for the data source')
+
         self.parser.add_argument('-d', dest='debug', action='store_true', help='Enables DEBUG level logging')
         self.parser.add_argument('-export-data-dir', dest='export_data_dir', default='/tmp/car_temp_export_data', help='Export data directory path, deafualt /tmp/car_temp_export_data')
         self.parser.add_argument('-keep-export-data-dir', dest='keep_export_data_dir', action='store_true', help='True for not removing export_data directory after complete, default false')
