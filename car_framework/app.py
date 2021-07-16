@@ -15,7 +15,7 @@ class BaseApp(object):
         self.parser.add_argument('-car-service-token', dest='api_token', default=os.getenv('CAR_SERVICE_AUTHTOKEN',None), type=str, required=False, help='Auth token for CAR ingestion service')
 
         # source id to uniquely identify each data source
-        self.parser.add_argument('-source', dest='source', default=os.getenv('CONNECTION_NAME',None), type=str, required=True, help='Unique source id for the data source')
+        self.parser.add_argument('-source', dest='source', default=os.getenv('CONNECTION_NAME',None), type=str, required=False, help='Unique source id for the data source')
 
         self.parser.add_argument('-d', dest='debug', action='store_true', help='Enables DEBUG level logging')
         self.parser.add_argument('-export-data-dir', dest='export_data_dir', default='/tmp/car_temp_export_data', help='Export data directory path, deafualt /tmp/car_temp_export_data')
