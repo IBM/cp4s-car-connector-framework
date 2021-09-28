@@ -47,7 +47,6 @@ class CarService(object):
     def reset_model_state_id(self):
         self.save_model_state_id('')
 
-    @deprecate
     def import_data(self, data):
         status = ImportJobStatus()
         try:
