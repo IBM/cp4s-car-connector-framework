@@ -1,6 +1,6 @@
-import requests, json, urllib
+import json, urllib
 from enum import Enum
-from car_framework.util import get_json, ImportJobStatus, recoverable_failure_status_code, RecoverableFailure, UnrecoverableFailure
+from car_framework.util import get_json, deprecate, ImportJobStatus, recoverable_failure_status_code, RecoverableFailure, UnrecoverableFailure
 from car_framework.context import context
 import time
 
@@ -47,7 +47,6 @@ class CarService(object):
     def reset_model_state_id(self):
         self.save_model_state_id('')
 
-    # depricated
     def import_data(self, data):
         status = ImportJobStatus()
         try:
@@ -201,6 +200,7 @@ class CarService(object):
             raise UnrecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % status_code)
 
 
+    @deprecate
     def graph_search(self, resource, search_id, source=""):
         external_id = urllib.parse.quote_plus(search_id)
 
@@ -218,6 +218,7 @@ class CarService(object):
             raise UnrecoverableFailure('Error occurred while searching collection: %d' % r.status_code)
 
 
+    @deprecate
     def graph_attribute_search(self, resource, attribute, search_id):
         external_id = urllib.parse.quote_plus(search_id)
         url = '%s?%s=%s' % (resource, attribute, external_id)

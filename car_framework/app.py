@@ -48,6 +48,11 @@ class BaseApp(object):
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url-for-token is provided then -car-service-token argument is required.')
                 sys.exit(2)
+                
+        if not args.source:
+            self.parser.print_usage(sys.stderr)
+            sys.stderr.write('Missing required -source argument.')
+            sys.exit(2)
 
         Context(args)
 

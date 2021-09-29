@@ -1,7 +1,18 @@
-from enum import Enum
-
 
 BATCH_SIZE = 20
+deprecate_msg_printed = {}
+
+
+def deprecate(func):
+    fn_name = '%s.%s' % (func.__module__, func.__name__)
+    def inner(*args, **kwargs):
+        global depricate_msg_printed
+        if not deprecate_msg_printed.get(fn_name):
+            from car_framework.context import context
+            context().logger.warn('%s function is deprecated and will be removed in upcoming versions. Consider rewriting the request without using %s' % (fn_name, func.__name__))
+            deprecate_msg_printed[fn_name] = True
+        return func(*args, **kwargs)
+    return inner
 
 
 def recoverable_failure_status_code(status_code):
