@@ -48,7 +48,7 @@ class BaseApp(object):
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url-for-token is provided then -car-service-token argument is required.')
                 sys.exit(2)
-                
+
         if not args.source:
             self.parser.print_usage(sys.stderr)
             sys.stderr.write('Missing required -source argument.')
@@ -60,6 +60,9 @@ class BaseApp(object):
     def run(self):
         try:
             try:
+                extension = self.get_schema_extension()
+                if extension: extension.setup()
+
                 context().logger.info('Attempting incremental import...')
                 context().inc_importer.run()
             except IncrementalImportNotPossible as e:
@@ -82,3 +85,7 @@ class BaseApp(object):
             context().logger.error(traceback.format_exc())
             # traceback.print_exc()
             sys.exit(1)
+
+
+    def get_schema_extension(self):
+        return None

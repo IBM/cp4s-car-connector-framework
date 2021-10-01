@@ -7,6 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 from car_framework.util import get_json
 from car_framework.context import context
 
+default_api_version = '/api/car/v2'
 
 class Response(object):
     def __init__(self, sc, data):
@@ -71,6 +72,10 @@ class Communicator(object):
     def send_request(self, req, func, path, **args):
         try:
             url = self.make_url(path)
+            if 'api_version' in args:
+                url = url.replace(default_api_version, args['api_version'])
+                del args['api_version']
+
             resp = func(url, auth=self.basic_auth, allow_redirects=False, headers=self.headers, **args)
             context().logger.debug('%s %s, status code: %d, response data: %s' % (req, url, resp.status_code, get_json(resp)))
             if resp.status_code != 200:
