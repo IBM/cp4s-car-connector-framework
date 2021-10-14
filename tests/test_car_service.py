@@ -175,7 +175,7 @@ class TestCarService(unittest.TestCase):
 
         results = context().car_service.graph_attribute_search('application', 'name', 'app_name-ebs')
 
-        assert len(results['results']) == 0
+        assert len(results['result']) == 0
         assert len(results['related']) == 0
 
     
@@ -189,7 +189,7 @@ class TestCarService(unittest.TestCase):
 
         results = context().car_service.graph_attribute_search('application', 'name', 'app_name-ebs')
 
-        assert len(results['results']) == 0
+        assert len(results['result']) == 0
         assert len(results['related']) == 0
         
 
@@ -202,7 +202,7 @@ class TestCarService(unittest.TestCase):
         
         results = context().car_service.graph_search('application', 'app_name-ebs')
         
-        assert len(results['results']) == 0
+        assert len(results['result']) == 0
         assert len(results['related']) == 0
 
     # @patch('car_framework.communicator.Communicator.patch')

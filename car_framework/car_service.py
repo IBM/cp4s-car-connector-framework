@@ -214,7 +214,7 @@ class CarService(object):
         if r.status_code == 200:
             return get_json(r)
         else:
-            return {'related': [], 'results': []}
+            return {'related': [], 'result': []}
 
 
     @deprecate
@@ -225,7 +225,7 @@ class CarService(object):
         if r.status_code == 200:
             return get_json(r)
         else:
-            return {'related': [], 'results': []}
+            return {'related': [], 'result': []}
 
 
     def database_patch_value(self, tags):
