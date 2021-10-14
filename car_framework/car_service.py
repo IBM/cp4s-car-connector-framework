@@ -226,10 +226,8 @@ class CarService(object):
         r = self.communicator.get(url)
         if r.status_code == 200:
             return get_json(r)
-        elif recoverable_failure_status_code(r.status_code):
-            raise RecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
         else:
-            raise UnrecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+            return {'related': [], 'results': []}
 
 
     def database_patch_value(self, tags):
@@ -250,10 +248,8 @@ class CarService(object):
 
         if r.status_code == 200:
             return get_json(r)
-        elif recoverable_failure_status_code(r.status_code):
-            raise RecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
         else:
-            raise UnrecoverableFailure('Error occurred while searching collection attribute: %d' % r.status_code)
+            return {'related': [], 'results': []}
 
 
     def edge_patch(self, source, edge_id, data):
