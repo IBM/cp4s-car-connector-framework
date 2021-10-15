@@ -173,10 +173,10 @@ class TestCarService(unittest.TestCase):
         response = {}
         mocked_send_get.return_value = MockJsonResponse(403, response)
 
-        with self.assertRaises(Exception) as error:
-            context().car_service.graph_attribute_search('application', 'name', 'app_name-ebs')
+        results = context().car_service.graph_attribute_search('application', 'name', 'app_name-ebs')
 
-        self.assertIsInstance(error.exception, RecoverableFailure)
+        assert len(results['result']) == 0
+        assert len(results['related']) == 0
 
     
     @patch('car_framework.communicator.Communicator.get')
@@ -187,10 +187,10 @@ class TestCarService(unittest.TestCase):
         response = {}
         mocked_send_get.return_value = MockJsonResponse(502, response)
 
-        with self.assertRaises(Exception) as error:
-            context().car_service.graph_attribute_search('application', 'name', 'app_name-ebs')
+        results = context().car_service.graph_attribute_search('application', 'name', 'app_name-ebs')
 
-        self.assertIsInstance(error.exception, UnrecoverableFailure)
+        assert len(results['result']) == 0
+        assert len(results['related']) == 0
         
 
     @patch('car_framework.communicator.Communicator.get')
@@ -199,10 +199,11 @@ class TestCarService(unittest.TestCase):
         context_patch()
         response = {}
         mocked_send_get.return_value = MockJsonResponse(403, response)
-        with self.assertRaises(Exception) as error:
-            context().car_service.graph_search('application', 'app_name-ebs')
         
-        self.assertIsInstance(error.exception, RecoverableFailure)
+        results = context().car_service.graph_search('application', 'app_name-ebs')
+        
+        assert len(results['result']) == 0
+        assert len(results['related']) == 0
 
     # @patch('car_framework.communicator.Communicator.patch')
     # def test_node_patch_exception(self, mock_log_details):
