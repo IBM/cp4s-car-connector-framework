@@ -40,9 +40,12 @@ def create_logger(debug = False, connector_name='Undefined'):
 def read_config(file_path, args):
     import json 
 
-    with open(file_path) as f:
-        config_file = json.load(f)
-        args.connector_name = config_file.get('connection', {}).get('type', {}).get('displayName', {})
+    try:
+        with open(file_path) as f:
+            config_file = json.load(f)
+            args.connector_name = config_file.get('connection', {}).get('type', {}).get('displayName', {})
+    except Exception:
+        args.connector_name = ""
 
 
 class Context(object):
