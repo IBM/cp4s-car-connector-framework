@@ -56,7 +56,8 @@ class Context(object):
         from car_framework.car_service import CarService
         from car_framework.communicator import Communicator
         self.args = args
-        read_config('configurations/config.json', self.args)
+        if not args.connector_name:
+            read_config('configurations/config.json', self.args)
         self.logger = create_logger(args.debug, args.connector_name)
         self.car_service = CarService(Communicator())
         
