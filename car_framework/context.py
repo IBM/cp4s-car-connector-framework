@@ -31,7 +31,7 @@ def create_logger(debug = False, connector_name='Undefined'):
 
     handler = logging.StreamHandler()
     handler.setLevel(debug and logging.DEBUG or logging.INFO)
-    format_string = '%(ibm_datetime)s %(source)s %(connector)s %(version)s %(level)s %(label)s %(message)s'
+    format_string = '%(ibm_datetime)s %(level)s %(label)s %(message)s'
     formatter = CustomJsonFormatter(format_string)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
