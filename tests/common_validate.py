@@ -27,6 +27,7 @@ def context_patch():
         'debug': False,
         'last_model_state_id': "1580649320000",
         'current_time': "1580649321920",
+        'connector_name': "test-connector-name",
     }
     Context(Struct(context_args))
 
