@@ -163,7 +163,7 @@ class CarService(object):
         if status_code == 400:
             # the database is not setup yet, create it
             r = self.communicator.post(db_url)
-            job_id = get_json(r)['job_id']
+            job_id = self._get_job_id_from_response(r)
             status = self.wait_until_done(job_id)
             if status == CarDbStatus.READY:
                 return CarDbStatus.NEWLY_CREATED
@@ -179,7 +179,7 @@ class CarService(object):
                 # create the graph
                 payload = json.dumps({ 'graph_name': 'assets'})
                 r = self.communicator.patch(db_url, data=payload)
-                job_id = get_json(r)['job_id']
+                job_id = self._get_job_id_from_response(r)
                 status = self.wait_until_done(job_id)
                 if status == CarDbStatus.READY:
                     return CarDbStatus.NEWLY_CREATED
@@ -188,7 +188,7 @@ class CarService(object):
             elif len(databases[0]['collections_without_indexes']) > 0:
                 payload = json.dumps({ 'collections_without_indexes': databases[0]['collections_without_indexes']})
                 r = self.communicator.patch(db_url, data=payload)
-                job_id = get_json(r)['job_id']
+                job_id = self._get_job_id_from_response(r)
                 status = self.wait_until_done(job_id)
                 if status == CarDbStatus.READY:
                     return CarDbStatus.NEWLY_CREATED
@@ -286,7 +286,7 @@ class CarService(object):
     def enter_full_import_in_progress_state(self):
         endpoint = 'source/%s%s' % (context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.post(endpoint)
-        job_id = get_json(r)['job_id']
+        job_id = self._get_job_id_from_response(r)
         self.wait_until_done(job_id)
         return r.status_code
 
@@ -294,7 +294,7 @@ class CarService(object):
     def exit_full_import_in_progress_state(self):
         endpoint = 'source/%s%s' % (context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.delete(endpoint)
-        job_id = get_json(r)['job_id']
+        job_id = self._get_job_id_from_response(r)
         self.wait_until_done(job_id)
         return r.status_code
 
@@ -337,3 +337,13 @@ class CarService(object):
         r = self.communicator.post(CAR_SCHEMA, data=json.dumps(data), api_version='/api/car/v3')
         if r.status_code not in (200, 201):
             raise Exception('Error when posting schema extension: %d' % r.status_code)
+
+
+    def _get_job_id_from_response(self, r):
+        job_id = None
+        try:
+            job_id = get_json(r)['job_id']
+        except Exception:
+            raise RecoverableFailure('CAR Endpoint did not return job_id while calling %s, status %s' % (r.url, r.status_code))
+
+        return job_id
