@@ -67,7 +67,6 @@ class BaseApp(object):
                 if hasattr(context(), 'asset_server') and hasattr(context().asset_server, 'test_connection') :
                     context().logger.info('Testing the datasource connection ... ')
                     code = context().asset_server.test_connection()
-                    print(code, "CODE")
                     if code == 0:
                         context().logger.info('Testing the datasource connection was successful.')
                     else:
