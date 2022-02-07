@@ -64,16 +64,17 @@ class BaseApp(object):
     def run(self):
         try:
             if self.args.connection_test:
-                if context().hasattr('asset_server'):
+                if hasattr(context(), 'asset_server') and hasattr(context().asset_server, 'test_connection') :
                     context().logger.info('Testing the datasource connection ... ')
                     code = context().asset_server.test_connection()
+                    print(code, "CODE")
                     if code == 0:
                         context().logger.info('Testing the datasource connection was successful.')
                     else:
                         context().logger.error('Testing the datasource connection failed with code ' + str(code))
                     exit(code)
                 else:
-                    raise DatasourceFailure("The connector did not implemented connection_test call.")
+                    raise DatasourceFailure("The connector did not implement connection_test call.")
             else:
                 try:
                     extension = self.get_schema_extension()
