@@ -1,5 +1,5 @@
 from car_framework.util import DatasourceFailure
 
-class AssetServer:
+class BaseAssetServer:
     def test_connection(self):
         raise DatasourceFailure("AssetServer.test_connection not implemented")
