@@ -48,6 +48,12 @@ class IncrementalImportNotPossible(Exception):
         context().logger.info(message)
         self.message = message
 
+class DatasourceFailure(Exception):
+    def __init__(self, message):
+        from car_framework.context import context
+        context().logger.error(message)
+        self.message = message
+
 
 def get_json(response):
     try: return response.json()

@@ -1,7 +1,7 @@
 import argparse, traceback, sys, os
 
 from car_framework.context import Context, context
-from car_framework.util import IncrementalImportNotPossible, RecoverableFailure, UnrecoverableFailure
+from car_framework.util import IncrementalImportNotPossible, RecoverableFailure, UnrecoverableFailure, DatasourceFailure
 
 
 class BaseApp(object):
@@ -20,6 +20,7 @@ class BaseApp(object):
         self.parser.add_argument('-version', dest='version', default=os.getenv('CONNECTOR_VERSION', None), type=str, required=False, help='Connector version number')
 
         self.parser.add_argument('-d', dest='debug', action='store_true', default=os.getenv('DEBUG', False), help='Enables DEBUG level logging')
+        self.parser.add_argument('-connection-test', dest='connection_test', action='store_true', default=os.getenv('DATASOURCE_CONNECTION_TEST', False), help='Only perform datasource connection test and exit')
         self.parser.add_argument('-export-data-dir', dest='export_data_dir', default='/tmp/car_temp_export_data', help='Export data directory path, deafualt /tmp/car_temp_export_data')
         self.parser.add_argument('-keep-export-data-dir', dest='keep_export_data_dir', action='store_true', help='True for not removing export_data directory after complete, default false')
         self.parser.add_argument('-export-data-page-size', dest='export_data_page_size', type=int, default=2000, help='File export_data dump page size, default 2000')
@@ -27,6 +28,7 @@ class BaseApp(object):
 
     def setup(self):
         args = self.parser.parse_args()
+        self.args = args
 
         if not args.api_token:
             if not args.api_key or not args.api_password:
@@ -61,15 +63,27 @@ class BaseApp(object):
 
     def run(self):
         try:
-            try:
-                extension = self.get_schema_extension()
-                if extension: extension.setup()
+            if self.args.connection_test:
+                if hasattr(context(), 'asset_server') and hasattr(context().asset_server, 'test_connection') :
+                    context().logger.info('Testing the datasource connection ... ')
+                    code = context().asset_server.test_connection()
+                    if code == 0:
+                        context().logger.info('Testing the datasource connection was successful.')
+                    else:
+                        context().logger.error('Testing the datasource connection failed with code ' + str(code))
+                    exit(code)
+                else:
+                    raise DatasourceFailure("The connector did not implement connection_test call.")
+            else:
+                try:
+                    extension = self.get_schema_extension()
+                    if extension: extension.setup()
 
-                context().logger.info('Attempting incremental import...')
-                context().inc_importer.run()
-            except IncrementalImportNotPossible as e:
-                context().logger.info('Attempting full import...')
-                context().full_importer.run()
+                    context().logger.info('Attempting incremental import...')
+                    context().inc_importer.run()
+                except IncrementalImportNotPossible as e:
+                    context().logger.info('Attempting full import...')
+                    context().full_importer.run()
 
             context().logger.info('Done.')
 
@@ -81,6 +95,9 @@ class BaseApp(object):
             context().logger.info('Unrecoverable failure: ' + e.message)
             context().logger.info('Incremental import will not be possible in the next run.')
             context().car_service.reset_model_state_id()
+            sys.exit(1)
+        except DatasourceFailure as e:
+            context().logger.info('Datasource failure: ' + e.message)
             sys.exit(1)
         except Exception as e:
             context().logger.exception(e)

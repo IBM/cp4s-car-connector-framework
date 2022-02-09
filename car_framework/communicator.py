@@ -51,7 +51,7 @@ class Communicator(object):
             backoff_factor=10,
             raise_on_status=False,
             status_forcelist=[403, 429, 503],
-            method_whitelist=["HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS", "TRACE"]
+            allowed_methods=["HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS", "TRACE"]
         )
 
         adapter = HTTPAdapter(max_retries=retry_strategy)
