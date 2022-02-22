@@ -97,7 +97,7 @@ class BaseApp(object):
             context().car_service.reset_model_state_id()
             sys.exit(1)
         except DatasourceFailure as e:
-            context().logger.info('Datasource failure: ' + e.message)
+            context().logger.info('Datasource failure: ' + str(e.message))
             sys.exit(1)
         except Exception as e:
             context().logger.exception(e)
