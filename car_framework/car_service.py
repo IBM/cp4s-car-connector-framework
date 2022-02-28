@@ -344,6 +344,9 @@ class CarService(object):
         try:
             job_id = get_json(r)['job_id']
         except Exception:
-            raise RecoverableFailure('CAR Endpoint did not return job_id while calling %s, status %s' % (r.url, r.status_code))
+            if recoverable_failure_status_code(r.status_code):
+                raise RecoverableFailure('CAR Endpoint did not return job_id while calling %s, status %s' % (r.url, r.status_code))
+            else:
+                raise UnrecoverableFailure('CAR Endpoint did not return job_id while calling %s, status %s' % (r.url, r.status_code))
 
         return job_id

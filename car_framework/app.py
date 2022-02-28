@@ -1,7 +1,7 @@
 import argparse, traceback, sys, os
 
 from car_framework.context import Context, context
-from car_framework.util import IncrementalImportNotPossible, RecoverableFailure, UnrecoverableFailure, DatasourceFailure
+from car_framework.util import ErrorCode, IncrementalImportNotPossible, RecoverableFailure, UnrecoverableFailure, DatasourceFailure
 
 
 class BaseApp(object):
@@ -34,29 +34,29 @@ class BaseApp(object):
             if not args.api_key or not args.api_password:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('Either -car-service-token or -car-service-key and -car-service-password arguments are required.')
-                sys.exit(2)
+                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
 
         if not args.car_service_apikey_url and not args.car_service_token_url:
             self.parser.print_usage(sys.stderr)
             sys.stderr.write('Either -car-service-url or -car-service-url-for-token is required.')
-            sys.exit(2)
+            sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
 
         if args.car_service_apikey_url:
             if not args.api_key or not args.api_password:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url is provided then -car-service-key and -car-service-password arguments are required.')
-                sys.exit(2)
+                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
 
         if args.car_service_token_url:
             if not args.api_token:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url-for-token is provided then -car-service-token argument is required.')
-                sys.exit(2)
+                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
 
         if not args.source:
             self.parser.print_usage(sys.stderr)
             sys.stderr.write('Missing required -source argument.')
-            sys.exit(2)
+            sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
 
         Context(args)
 
@@ -71,7 +71,7 @@ class BaseApp(object):
                         context().logger.info('Testing the datasource connection was successful.')
                     else:
                         context().logger.error('Testing the datasource connection failed with code ' + str(code))
-                    exit(code)
+                    sys.exit(code)
                 else:
                     raise DatasourceFailure("The connector did not implement connection_test call.")
             else:
@@ -90,20 +90,20 @@ class BaseApp(object):
         except RecoverableFailure as e:
             context().logger.info('Recoverable failure: ' + e.message)
             context().logger.info('Incremental import will be attempted again in the next run.')
-            sys.exit(1)
+            sys.exit(e.code)
         except UnrecoverableFailure as e:
             context().logger.info('Unrecoverable failure: ' + e.message)
             context().logger.info('Incremental import will not be possible in the next run.')
             context().car_service.reset_model_state_id()
-            sys.exit(1)
+            sys.exit(e.code)
         except DatasourceFailure as e:
             context().logger.info('Datasource failure: ' + str(e.message))
-            sys.exit(1)
+            sys.exit(e.code)
         except Exception as e:
             context().logger.exception(e)
             context().logger.error(traceback.format_exc())
             # traceback.print_exc()
-            sys.exit(1)
+            sys.exit(ErrorCode.GENERAL_APPLICATION_FAILURE)
 
 
     def get_schema_extension(self):

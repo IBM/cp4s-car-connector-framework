@@ -1,3 +1,4 @@
+from enum import Enum
 
 BATCH_SIZE = 20
 deprecate_msg_printed = {}
@@ -27,19 +28,58 @@ def check_for_error(status):
         raise UnrecoverableFailure('Import job failure. Status code: %d, Error: %s' % (status.status_code, status.error))
 
 
-class RecoverableFailure(Exception):
-    def __init__(self, message):
+def get_json(response):
+    try: return response.json()
+    except: return {}
+
+class ErrorCode(Enum):
+    # https://komodor.com/learn/exit-codes-in-containers-and-kubernetes-the-complete-guide/
+    ## kubectl preserved
+    # Exit Code 0
+    # Exit Code 1: Application Error
+    # Exit Code 125
+    # Exit Code 126: Command Invoke Error
+    # Exit Code 127: File or Directory Not Found
+    # Exit Code 128: Invalid Argument Used on Exit
+    # Exit Code 134: Abnormal Termination (SIGABRT)
+    # Exit Code 137: Immediate Termination (SIGKILL)
+    # Exit Code 139: Segmentation Fault (SIGSEGV)
+    # Exit Code 143: Graceful Termination (SIGTERM)
+    # Exit Code 255: Exit Status Out Of Range
+
+    # If the Exit Code is 0 – the container exited normally, no troubleshooting is required
+    # If the Exit Code is between 1-128 – the container terminated due to an internal error, such as a missing or invalid command in the image specification
+    # If the Exit Code is between 129-255 – the container was stopped as the result of an operating signal, such as SIGKILL or SIGINT
+    # If the Exit Code was exit(-1) or another value outside the 0-255 range, kubectl translates it to a value within the 0-255 range.
+
+    GENERAL_APPLICATION_FAILURE = 1 # Unknown
+    CONNECTOR_RUNTIME_INVALID_PARAMETER = 2 # python command argumens problem 
+    RECOVERABLE_DEFAULT_FAILURE = 10 # RecoverableFailure exception default code
+    # RECOVERABLE_DATABASE_FAILURE = 11 # Database is not ready
+    # RECOVERABLE_UPDATE_COLLECTION_FAILURE = 12 # Error occurred while pathcing collection
+    # RECOVERABLE_UPDATE_EDGE_FAILURE = 13 # Error occurred while updating edge
+    # RECOVERABLE_IMPORT_JOB_FAILURE = 14 # Import job failure
+    UNRECOVERABLE_FAILURE_DEFAULT = 20 # UnrecoverableFailure exception default code
+    DATASOURCE_FAILURE_DEFAULT = 50 # Unknown
+    DATASOURCE_FAILURE_CONNECT = 51 # Service unavailable
+    DATASOURCE_FAILURE_AUTH = 52 # Authentication fail
+    DATASOURCE_FAILURE_FORBIDDEN = 53 # Forbidden
+    DATASOURCE_FAILURE_INVALID_PARAMETER = 54 # Invalid parameter
+
+class BaseConnectorFailure(Exception):
+    def __init__(self, message, code: int):
         from car_framework.context import context
         context().logger.error(message)
         self.message = message
+        self.code = code
 
+class RecoverableFailure(BaseConnectorFailure):
+    def __init__(self, message, code=ErrorCode.RECOVERABLE_DEFAULT_FAILURE):
+        super().__init__(message, code)
 
-class UnrecoverableFailure(Exception):
-    def __init__(self, message):
-        from car_framework.context import context
-        context().logger.error(message)
-        self.message = message
-
+class UnrecoverableFailure(BaseConnectorFailure):
+    def __init__(self, message, code=ErrorCode.UNRECOVERABLE_FAILURE_DEFAULT):
+        super().__init__(message, code)
 
 class IncrementalImportNotPossible(Exception):
     callback = None
@@ -48,16 +88,9 @@ class IncrementalImportNotPossible(Exception):
         context().logger.info(message)
         self.message = message
 
-class DatasourceFailure(Exception):
-    def __init__(self, message):
-        from car_framework.context import context
-        context().logger.error(message)
-        self.message = message
-
-
-def get_json(response):
-    try: return response.json()
-    except: return {}
+class DatasourceFailure(BaseConnectorFailure):
+    def __init__(self, message, code=ErrorCode.DATASOURCE_FAILURE_DEFAULT):
+        super().__init__(message, code)
 
 
 class ImportJobStatus(object):
