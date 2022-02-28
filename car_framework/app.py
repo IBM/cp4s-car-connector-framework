@@ -34,29 +34,29 @@ class BaseApp(object):
             if not args.api_key or not args.api_password:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('Either -car-service-token or -car-service-key and -car-service-password arguments are required.')
-                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
+                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
         if not args.car_service_apikey_url and not args.car_service_token_url:
             self.parser.print_usage(sys.stderr)
             sys.stderr.write('Either -car-service-url or -car-service-url-for-token is required.')
-            sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
+            sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
         if args.car_service_apikey_url:
             if not args.api_key or not args.api_password:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url is provided then -car-service-key and -car-service-password arguments are required.')
-                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
+                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
         if args.car_service_token_url:
             if not args.api_token:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url-for-token is provided then -car-service-token argument is required.')
-                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
+                sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
         if not args.source:
             self.parser.print_usage(sys.stderr)
             sys.stderr.write('Missing required -source argument.')
-            sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER)
+            sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
         Context(args)
 
@@ -103,7 +103,7 @@ class BaseApp(object):
             context().logger.exception(e)
             context().logger.error(traceback.format_exc())
             # traceback.print_exc()
-            sys.exit(ErrorCode.GENERAL_APPLICATION_FAILURE)
+            sys.exit(ErrorCode.GENERAL_APPLICATION_FAILURE.value)
 
 
     def get_schema_extension(self):

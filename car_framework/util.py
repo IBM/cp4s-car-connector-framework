@@ -74,11 +74,11 @@ class BaseConnectorFailure(Exception):
         self.code = code
 
 class RecoverableFailure(BaseConnectorFailure):
-    def __init__(self, message, code=ErrorCode.RECOVERABLE_DEFAULT_FAILURE):
+    def __init__(self, message, code=ErrorCode.RECOVERABLE_DEFAULT_FAILURE.value):
         super().__init__(message, code)
 
 class UnrecoverableFailure(BaseConnectorFailure):
-    def __init__(self, message, code=ErrorCode.UNRECOVERABLE_FAILURE_DEFAULT):
+    def __init__(self, message, code=ErrorCode.UNRECOVERABLE_FAILURE_DEFAULT.value):
         super().__init__(message, code)
 
 class IncrementalImportNotPossible(Exception):
@@ -89,7 +89,7 @@ class IncrementalImportNotPossible(Exception):
         self.message = message
 
 class DatasourceFailure(BaseConnectorFailure):
-    def __init__(self, message, code=ErrorCode.DATASOURCE_FAILURE_DEFAULT):
+    def __init__(self, message, code=ErrorCode.DATASOURCE_FAILURE_DEFAULT.value):
         super().__init__(message, code)
 
 
