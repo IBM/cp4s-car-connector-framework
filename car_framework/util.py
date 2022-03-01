@@ -65,6 +65,7 @@ class ErrorCode(Enum):
     DATASOURCE_FAILURE_AUTH = 52 # Authentication fail
     DATASOURCE_FAILURE_FORBIDDEN = 53 # Forbidden
     DATASOURCE_FAILURE_INVALID_PARAMETER = 54 # Invalid parameter
+    DATASOURCE_FAILURE_DATA_PROCESS = 55 # Error while processing received data
 
 class BaseConnectorFailure(Exception):
     def __init__(self, message, code: int):
