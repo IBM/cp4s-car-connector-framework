@@ -9,7 +9,6 @@ STATUS_RESOURCE = '/importstatus'
 DATABASE_RESOURCE = '/databases'
 JOBSTATUS_RESOURCE = '/jobstatus'
 SOURCE_RESOURCE = '/source'
-GRAPH_SEARCH = '/graph'
 CAR_SCHEMA = '/carSchema'
 
 FULL_IMPORT_IN_PROGRESS_ENDPOINT = '/full-import-in-progress'
@@ -201,23 +200,6 @@ class CarService(object):
             raise UnrecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % status_code)
 
 
-    @deprecate
-    def graph_search(self, resource, search_id, source=""):
-        external_id = urllib.parse.quote_plus(search_id)
-
-        url = '%s/%s%s' % (resource, external_id, GRAPH_SEARCH)
-        if source == "":
-            source = context().args.source
-
-        r = self.communicator.get(url, params={'source': source})
-
-        if r.status_code == 200:
-            return get_json(r)
-        else:
-            return {'related': [], 'result': []}
-
-
-    @deprecate
     def graph_attribute_search(self, resource, attribute, search_id):
         external_id = urllib.parse.quote_plus(search_id)
         url = '%s?%s=%s' % (resource, attribute, external_id)
