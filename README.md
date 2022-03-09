@@ -16,4 +16,5 @@ Things to note:
 * Because of the above the the connector code should properly use (throw/raise) one of two following exceptions when detecting failures:
   * RecoverableFailure is to be used when the failure cannot potentially create a data gap and we can attempt an incremental import session when running next time. One example of a recoverable failure is a connectivity problem.
   * UnrecoverableFailure is to be used when the failure can potentially create a data gap and we must run full import session to recover.
+  * DatasourceFailure is to be used when there is datasource API issues.
 
