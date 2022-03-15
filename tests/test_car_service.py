@@ -124,17 +124,6 @@ class TestCarService(unittest.TestCase):
 
     @staticmethod
     @patch('car_framework.communicator.Communicator.get')
-    def test_graph_search(mock_get_request):
-        """Unit test cases for graph search"""
-        context_patch()
-        mock_get_request.return_value = JsonResponse(200, 'db_car_search.json')
-        search_id = 'db-SW7U4PNNHP5K4FSQ7SVHYOJH6E'
-        status = context().car_service.graph_search('database', search_id)
-        assert status['result'] is not None
-        assert (status['result']['external_id'][0]).__contains__(search_id)
-
-    @staticmethod
-    @patch('car_framework.communicator.Communicator.get')
     def test_graph_attribute_search(mock_get_request):
         """Unit test cases for attribute search"""
         context_patch()
@@ -192,18 +181,6 @@ class TestCarService(unittest.TestCase):
         assert len(results['result']) == 0
         assert len(results['related']) == 0
         
-
-    @patch('car_framework.communicator.Communicator.get')
-    def test_search_exception(self, mocked_send_get):
-        """Unit test for graph search exception"""
-        context_patch()
-        response = {}
-        mocked_send_get.return_value = MockJsonResponse(403, response)
-        
-        results = context().car_service.graph_search('application', 'app_name-ebs')
-        
-        assert len(results['result']) == 0
-        assert len(results['related']) == 0
 
     # @patch('car_framework.communicator.Communicator.patch')
     # def test_node_patch_exception(self, mock_log_details):
