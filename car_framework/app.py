@@ -20,7 +20,7 @@ class BaseApp(object):
         self.parser.add_argument('-version', dest='version', default=os.getenv('CONNECTOR_VERSION', None), type=str, required=False, help='Connector version number')
 
         self.parser.add_argument('-d', dest='debug', action='store_true', default=os.getenv('DEBUG', False), help='Enables DEBUG level logging')
-        self.parser.add_argument('-connection-test', dest='connection_test', action='store_true', default=os.getenv('DATASOURCE_CONNECTION_TEST', False), help='Only perform datasource connection test and exit')
+        self.parser.add_argument('-connection-test', dest='connection_test', type=bool, default=os.getenv('DATASOURCE_CONNECTION_TEST', False), help='Only perform datasource connection test and exit, if a value parameter with any value is present.')
         self.parser.add_argument('-export-data-dir', dest='export_data_dir', default='/tmp/car_temp_export_data', help='Export data directory path, deafualt /tmp/car_temp_export_data')
         self.parser.add_argument('-keep-export-data-dir', dest='keep_export_data_dir', action='store_true', help='True for not removing export_data directory after complete, default false')
         self.parser.add_argument('-export-data-page-size', dest='export_data_page_size', type=int, default=2000, help='File export_data dump page size, default 2000')
