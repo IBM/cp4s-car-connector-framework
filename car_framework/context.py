@@ -25,7 +25,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         log_record['message'] = log_record['message'] if log_record.get('log') else record.message
         log_record['label'] = log_record['label'] if log_record.get('type') else record.name
 
-def create_logger(debug = False, connector_name='Undefined'):
+def create_logger(debug = False):
     logger = logging.getLogger()
     logger.setLevel(debug and logging.DEBUG or logging.INFO)
 
@@ -58,7 +58,7 @@ class Context(object):
         self.args = args
         if not args.connector_name:
             read_config('configurations/config.json', self.args)
-        self.logger = create_logger(args.debug, args.connector_name)
+        self.logger = create_logger(args.debug)
         self.car_service = CarService(Communicator())
         
 
