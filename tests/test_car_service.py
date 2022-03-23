@@ -138,12 +138,12 @@ class TestCarService(unittest.TestCase):
     def test_query_graphql(mocked_send_post):
         """Unit test cases for attribute search"""
         context_patch()
-        data = """query {
-                        asset_application(where: {source: {_eq: "car-aws-test"}})
-                        {
-                            source
-                        }
-                    }"""
+        data = """{
+                    asset_application(where: {source: {_eq: "car-aws-test"}})
+                    {
+                        source
+                    }
+                }"""
         result = """{
                     "data": {
                         "asset_application": [

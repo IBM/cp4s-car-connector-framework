@@ -212,7 +212,7 @@ class CarService(object):
             return {'related': [], 'result': []}
 
     def query_graphql(self, query):
-        r = self.communicator.post(GRAPH_QL, data={'query': query}, api_version='/api/car/v3')
+        r = self.communicator.post(GRAPH_QL, data=json.dumps({"query": query}), api_version='/api/car/v3')
         if r.status_code == 200:
             return get_json(r)
         if r.status_code == 404:
