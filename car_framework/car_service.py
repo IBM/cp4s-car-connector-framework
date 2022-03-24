@@ -211,6 +211,14 @@ class CarService(object):
         else:
             return {'related': [], 'result': []}
 
+    def search_collection(self, resource, attribute, search_id, fields):
+        query= "{ %s(where: {%s: {_eq: \"%s\"}}) {  %s  }}" % (resource, attribute, search_id, ','.join(fields))
+        result = self.query_graphql(query)
+        if result:
+            return result["data"]
+        else:  
+            return None
+
     def query_graphql(self, query):
         r = self.communicator.post(GRAPH_QL, data=json.dumps({"query": query}), api_version='/api/car/v3')
         if r.status_code == 200:

@@ -162,6 +162,34 @@ class TestCarService(unittest.TestCase):
         assert status['data']['asset_application'][0]['source'] == json.loads(result)['data']['asset_application'][0]['source']
 
     @staticmethod
+    @patch('car_framework.communicator.Communicator.post')
+    def test_search_collection(mocked_send_post):
+        """Unit test cases for attribute search"""
+        context_patch()
+        data = """{
+                    asset_application(where: {source: {_eq: "car-aws-test"}})
+                    {
+                        source
+                    }
+                }"""
+        result = """{
+                    "data": {
+                        "asset_application": [
+                            {
+                                "source": "car-aws-test"
+                            },
+                            {
+                                "source": "car-aws-test"
+                            }
+                        ]
+                    }
+                }"""
+        mocked_send_post.return_value = MockJsonResponse(200, result)
+        status = context().car_service.search_collection("asset_application", "source", "car-aws-test", ["source", "asset_id", "application_id"])
+        assert status is not None
+        assert status['asset_application'][0]['source'] == json.loads(result)['data']['asset_application'][0]['source']
+
+    @staticmethod
     @patch('car_framework.communicator.Communicator.patch')
     def test_node_patch_value(mock_patch_request):
         """Unit test cases for patch value"""
