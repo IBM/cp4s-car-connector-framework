@@ -10,6 +10,7 @@ DATABASE_RESOURCE = '/databases'
 JOBSTATUS_RESOURCE = '/jobstatus'
 SOURCE_RESOURCE = '/source'
 CAR_SCHEMA = '/carSchema'
+GRAPH_QL = '/query'
 
 FULL_IMPORT_IN_PROGRESS_ENDPOINT = '/full-import-in-progress'
 MODEL_STATE_ID = 'model_state_id'
@@ -200,6 +201,7 @@ class CarService(object):
             raise UnrecoverableFailure('Getting the following status code when accessing ISC CAR service: %d' % status_code)
 
 
+    @deprecate
     def graph_attribute_search(self, resource, attribute, search_id):
         external_id = urllib.parse.quote_plus(search_id)
         url = '%s?%s=%s' % (resource, attribute, external_id)
@@ -209,6 +211,21 @@ class CarService(object):
         else:
             return {'related': [], 'result': []}
 
+    def search_collection(self, resource, attribute, search_id, fields):
+        query= "{ %s(where: {%s: {_eq: \"%s\"}}) {  %s  }}" % (resource, attribute, search_id, ','.join(fields))
+        result = self.query_graphql(query)
+        if result:
+            return result["data"]
+        else:  
+            return None
+
+    def query_graphql(self, query):
+        r = self.communicator.post(GRAPH_QL, data=json.dumps({"query": query}), api_version='/api/car/v3')
+        if r.status_code == 200:
+            return get_json(r)
+        if r.status_code == 404:
+            return None
+        raise Exception('Error when Graph query api called: %d' % r.status_code)    
 
     def database_patch_value(self, tags):
         data = dict()
