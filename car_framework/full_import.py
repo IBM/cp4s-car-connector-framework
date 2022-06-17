@@ -1,6 +1,4 @@
-from car_framework.car_service import CarDbStatus
 from car_framework.base_import import BaseImport
-from car_framework.util import RecoverableFailure, check_for_error
 from car_framework.context import context
 
 
@@ -17,32 +15,18 @@ class BaseFullImport(BaseImport):
         raise NotImplementedError()
 
 
-    def create_source_report_object(self):
-        raise NotImplementedError()
-
-
     def get_new_model_state_id(self):
         raise NotImplementedError()
 
 
     def init(self):
-        db_status = context().car_service.get_db_status()
-        if db_status == CarDbStatus.FAILURE:
-            raise RecoverableFailure('Database is not ready.')
-        
-        context().car_service.enter_full_import_in_progress_state()
-
-        source_report_data = self.create_source_report_object()
-        status = context().car_service.import_data(source_report_data)
-        check_for_error(status)
-
-        self.statuses.append(status)
-        self.wait_for_completion_of_import_jobs()
+        context().car_service.create_source_if_needed()
+        context().car_service.prepare_full_import(context().report_time)
         self.new_model_state_id = self.get_new_model_state_id()
 
 
     def complete(self):
-        context().car_service.exit_full_import_in_progress_state()
+        context().car_service.complete_full_import()
         self.save_new_model_state_id(self.new_model_state_id)
         context().logger.info('Done.')
 
@@ -50,7 +34,5 @@ class BaseFullImport(BaseImport):
     def run(self):
         self.init()
         self.import_vertices()
-        self.wait_for_completion_of_import_jobs()
         self.import_edges()
-        self.wait_for_completion_of_import_jobs()
         self.complete()

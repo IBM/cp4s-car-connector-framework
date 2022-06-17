@@ -1,4 +1,6 @@
 from enum import Enum
+import json
+from math import floor
 
 BATCH_SIZE = 20
 deprecate_msg_printed = {}
@@ -20,17 +22,25 @@ def recoverable_failure_status_code(status_code):
     return status_code in (302, 400, 401, 403, 408, 500, 503, 504)
 
 
-def check_for_error(status):
-    if status.status != ImportJobStatus.FAILURE: return
-    if recoverable_failure_status_code(status.status_code):
-        raise RecoverableFailure('Import job failure. Status code: %d, Error: %s' % (status.status_code, status.error))
-    else:
-        raise UnrecoverableFailure('Import job failure. Status code: %d, Error: %s' % (status.status_code, status.error))
+def check_status_code(status_code, operation):
+    if floor(status_code / 100) != 2:
+        message = 'Failure detected. Operation: %s, Status code: %s' % (operation, status_code)
+        if recoverable_failure_status_code(status_code): raise RecoverableFailure(message)
+        else: raise UnrecoverableFailure(message)
 
 
 def get_json(response):
     try: return response.json()
     except: return {}
+
+
+def get(var, path):
+    fields = path.split('.')
+    v = var
+    for f in fields:
+        v = v.get(f)
+        if v == None: return None
+    return v
 
 class ErrorCode(Enum):
     # https://komodor.com/learn/exit-codes-in-containers-and-kubernetes-the-complete-guide/
@@ -94,13 +104,7 @@ class DatasourceFailure(BaseConnectorFailure):
         super().__init__(message, code)
 
 
-class ImportJobStatus(object):
+def check_for_error(status):
+    if status.get('errors') and len(status['errors']) > 0:
+        raise UnrecoverableFailure('Import job failure. Errors: ' + json.dumps(status['errors']))
 
-    FAILURE = 0
-    IN_PROGRESS = 1
-    SUCCESS = 2
-
-    def __init__(self):
-        self.status = ImportJobStatus.FAILURE
-        self.status_code = 0
-        self.error = 'Inknown'

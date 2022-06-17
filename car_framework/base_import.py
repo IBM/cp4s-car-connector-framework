@@ -7,31 +7,9 @@ class BaseImport(object):
     def __init__(self):
         self.statuses = []
 
-    def create_source_report_object(self):
-        raise NotImplementedError()
-
-    def wait_for_completion_of_import_jobs(self):
-        context().car_service.check_import_status(self.statuses)
-        for status in self.statuses:
-            check_for_error(status)
-        self.statuses = []
-
-    def send_data(self, name, data):
-        envelope = self.create_source_report_object()
-        if name:
-            envelope[name] = data
-        status = context().car_service.import_data(envelope)
+    def send_mutation(self, mutation):
+        status = context().car_service.send_mutation(mutation)
         check_for_error(status)
-        self.statuses.append(status)
-        if len(self.statuses) == BATCH_SIZE:
-            self.wait_for_completion_of_import_jobs()
-
-    def send_data_from_file(self, name, data_file):
-        status = context().car_service.import_data_from_file(data_file)
-        check_for_error(status)
-        self.statuses.append(status)
-        if len(self.statuses) == BATCH_SIZE:
-            self.wait_for_completion_of_import_jobs()
 
     def get_last_model_state_id(self):
         return context().car_service.get_model_state_id()

@@ -60,6 +60,7 @@ class Context(object):
             read_config('configurations/config.json', self.args)
         self.logger = create_logger(args.debug)
         self.car_service = CarService(Communicator())
+        self.report_time = datetime.utcnow().isoformat()
         
 
 global_context = None
