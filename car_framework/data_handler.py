@@ -60,7 +60,7 @@ class BaseDataHandler():
         valid = self.import_schema.evaluate(JSON({name: [validate_object]}))
         if not valid.valid:
             erro_msg = []
-            output = valid.output('detailed')
+            output = valid.output('basic')
             print(output)
             for error in output['errors']:
                 erro_msg.append(error['error'])
