@@ -66,7 +66,7 @@ class BaseDataHandler():
                 erro_msg.append(error['error'])
 
             if erro_msg:
-                context().logger.warning("Skipping adding not valid datafor %s: %s. The data supplied was: %s" % (name, erro_msg, object))
+                context().logger.warning("Skipped adding not valid data for %s: %s. The data supplied was: %s" % (name, erro_msg, object))
                 return False
 
         objects = self.collections.get(name)
