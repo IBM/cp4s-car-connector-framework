@@ -3,10 +3,18 @@ import json
 import os
 import shutil
 import uuid
+import warnings
+from jschon import JSON, JSONSchema, URI, create_catalog
 
 from car_framework.context import context
 from car_framework.full_import import BaseFullImport
 
+
+transform_data = {
+    'hostname': [{'substitute': '_key', 'requited': 'host_name'}, {'substitute': '_key', 'requited': 'external_id'}],
+    'ipaddress': [{'substitute': '_key', 'requited': 'name'}],
+    'macaddress': [{'substitute': '_key', 'requited': 'name'}],
+}
 
 def get_report_time():
     delta = datetime.utcnow() - datetime(1970, 1, 1)
@@ -23,6 +31,7 @@ class BaseDataHandler():
     collection_keys = {}
     edges = {}
     edge_keys = {}
+    import_schema = None
 
     def __init__(self):
         self.timestamp = get_report_time()
@@ -31,8 +40,35 @@ class BaseDataHandler():
     def create_source_report_object(self):
         raise NotImplementedError()
 
-        # Adds the collection data
-    def add_collection(self, name, object, key):
+    # Adds the collection data
+    def add_collection(self, name, object:dict, key):
+        # transform
+        validate_object = object.copy()
+        if name in transform_data:
+            for transform in transform_data[name]:
+                if transform['substitute'] in validate_object and transform['requited'] not in validate_object:
+                    validate_object[transform['requited']] = validate_object[transform['substitute']]
+
+        # validate
+        if not self.import_schema:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', DeprecationWarning)
+                import_schema = context().car_service.get_import_schema()
+                create_catalog('2020-12')
+                self.import_schema = JSONSchema(import_schema['schema'], metaschema_uri=URI("https://json-schema.org/draft/2020-12/schema"))
+        
+        valid = self.import_schema.evaluate(JSON({name: [validate_object]}))
+        if not valid.valid:
+            erro_msg = []
+            output = valid.output('detailed')
+            print(output)
+            for error in output['errors']:
+                erro_msg.append(error['error'])
+
+            if erro_msg:
+                context().logger.warning("Skipping adding not valid datafor %s: %s. The data supplied was: %s" % (name, erro_msg, object))
+                return False
+
         objects = self.collections.get(name)
         if not objects:
             objects = []
@@ -51,6 +87,8 @@ class BaseDataHandler():
         if len(self.collections[name]) >= context().args.export_data_page_size:
             self._save_export_data_file(name, self.collections[name])
             self.collections[name] = []
+
+        return True
 
     # Adds the edge between two vertices
 

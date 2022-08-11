@@ -28,6 +28,9 @@ def context_patch():
         'last_model_state_id': "1580649320000",
         'current_time': "1580649321920",
         'connector_name': "test-connector-name",
+        'export_data_dir': "./cache",
+        'export_data_page_size': 20,
+        'version': 1
     }
     Context(Struct(context_args))
 
