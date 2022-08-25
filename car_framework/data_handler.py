@@ -94,6 +94,8 @@ class BaseDataHandler():
             self.collection_keys[name] = keys
 
         if not object['external_id'] in self.collection_keys[name]:
+            object['source'] = context().args.source
+            object['reported_at'] = context().report_time
             objects.append(object)
             self.collection_keys[name].append(object['external_id'])
 
