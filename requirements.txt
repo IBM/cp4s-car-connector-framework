@@ -2,3 +2,4 @@
 requests>=2.24.0
 python-json-logger==0.1.9
 jschon==0.8.5 
+jwcrypto>=1.4.2

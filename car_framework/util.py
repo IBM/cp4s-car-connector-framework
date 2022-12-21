@@ -1,6 +1,13 @@
 from enum import Enum
+from jwcrypto import jwk, jwe
+from pathlib import Path
+import json
+import os
+from os import listdir
+from os.path import isfile, join
 
 BATCH_SIZE = 20
+SECRET_FILE_PATH = "/etc/secrets"
 deprecate_msg_printed = {}
 
 
@@ -103,4 +110,50 @@ class ImportJobStatus(object):
     def __init__(self):
         self.status = ImportJobStatus.FAILURE
         self.status_code = 0
-        self.error = 'Inknown'
+        self.error = 'Unknown'
+
+def _get_conf() -> str:
+    conf_path = Path(SECRET_FILE_PATH)
+    if not conf_path.exists():
+        return False
+
+    conf_encrypted = {}
+    for file in os.listdir(SECRET_FILE_PATH):
+        if file != "key.jwk":
+            with Path(os.path.join(SECRET_FILE_PATH, file)).open() as fp:
+                encrypted_var = fp.read()
+                conf_encrypted[file] = encrypted_var
+    return conf_encrypted
+
+
+def _get_key_text() -> str:
+    # key.jwk is in a random UUID dir
+    jwk_path = next(Path("/etc/secrets/key.jwk"))
+    with jwk_path.open() as fp:
+        key_text = fp.read()
+    return key_text
+
+
+def decrypt_secrets() -> dict:
+    from car_framework.context import context
+    try:
+        conf_encrypted = _get_conf()
+        if not conf_encrypted:
+            return False
+        key_text = _get_key_text()
+        key = jwk.JWK.from_json(key_text)
+        conf_decrypted = {}
+        for file, encrepted_value in conf_encrypted:
+            jwe_obj = jwe.JWE.from_jose_token(encrepted_value)
+            jwe_obj.decrypt(key)
+            conf_decrypted[file] = jwe_obj.plaintext
+
+        return objectview(conf_decrypted)
+
+    except Exception:
+        context().logger.exception("Error extracting secrets")
+        return {}
+
+class objectview(object):
+    def __init__(self, d):
+        self.__dict__ = d
