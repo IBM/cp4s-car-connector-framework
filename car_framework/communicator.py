@@ -78,7 +78,7 @@ class Communicator(object):
 
             resp = func(url, auth=self.basic_auth, allow_redirects=False, headers=self.headers, **args)
             context().logger.debug('%s %s, status code: %d, response data: %s' % (req, url, resp.status_code, get_json(resp)))
-            if resp.status_code != 200:
+            if resp.status_code not in (200, 201):
                 context().logger.warn('%s %s, status code: %d, response data: %s, request params: %s, request data: %s' % (req,
                     url, resp.status_code, get_json(resp), args.get('params'), args.get('data')))
             return resp
