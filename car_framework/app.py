@@ -105,7 +105,7 @@ class BaseApp(object):
         except Exception as e:
             context().logger.exception(e)
             context().logger.error(traceback.format_exc())
-            context().logger.info('Unhandled Exception. Please consider to handle this error with a corresponding error code. See: https://github.com/IBM/cp4s-car-connectors/blob/develop/guide-build-connectors.md')
+            context().logger.info('Unhandled Exception. Please consider to handle this error with a corresponding error code. See: https://github.com/IBM/cp4s-car-connectors/blob/develop/guide-build-connectors.md#error-handling')
             # traceback.print_exc()
             sys.exit(ErrorCode.GENERAL_APPLICATION_FAILURE.value)
 
