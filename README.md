@@ -20,6 +20,9 @@ Things to note:
   * [UnrecoverableFailure](https://github.com/IBM/cp4s-car-connector-framework/blob/99554ac2cfa0732af090c46be9e356beb015934e/car_framework/util.py#L81) is to be used when the failure can potentially create a data gap and we must run full import session to recover.
   * [DatasourceFailure](https://github.com/IBM/cp4s-car-connector-framework/blob/99554ac2cfa0732af090c46be9e356beb015934e/car_framework/util.py#L92) is to be used when there is datasource API issues.
 
+RecoverableFailure and UnrecoverableFailure are mostly handled in the framework. DatasourceFailure is to be used in the connector code with [a corresponding error code](https://github.com/IBM/cp4s-car-connector-framework/blob/99554ac2cfa0732af090c46be9e356beb015934e/car_framework/util.py#L35). Example: `return ErrorCode.TRANSMISSION_AUTH_CREDENTIALS.value`. 
+If none of the Failure classes is used, the framework will raise a [GENERAL_APPLICATION_FAILURE](https://github.com/IBM/cp4s-car-connector-framework/blob/99554ac2cfa0732af090c46be9e356beb015934e/car_framework/app.py#L106) (Unknown error) and print the error stack. 
+
 For more information use guides
 * https://github.com/IBM/cp4s-car-connectors/blob/develop/README.md
 * https://github.com/IBM/cp4s-car-connectors/blob/develop/guide-build-connectors.md
