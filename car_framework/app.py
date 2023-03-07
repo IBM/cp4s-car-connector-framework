@@ -30,39 +30,39 @@ class BaseApp(object):
 
         file_secrets = decrypt_secrets()
         args = vars(self.parser.parse_args())
-        args.update(file_secrets)
+        if(file_secrets):
+            args.update(file_secrets)
         self.args = objectview(args)
 
-
-        if not args.api_token:
-            if not args.api_key or not args.api_password:
+        if not self.args.api_token:
+            if not self.args.api_key or not self.args.api_password:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('Either -car-service-token or -car-service-key and -car-service-password arguments are required.')
                 sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
-        if not args.car_service_apikey_url and not args.car_service_token_url:
+        if not self.args.car_service_apikey_url and not self.args.car_service_token_url:
             self.parser.print_usage(sys.stderr)
             sys.stderr.write('Either -car-service-url or -car-service-url-for-token is required.')
             sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
-        if args.car_service_apikey_url:
-            if not args.api_key or not args.api_password:
+        if self.args.car_service_apikey_url:
+            if not self.args.api_key or not self.args.api_password:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url is provided then -car-service-key and -car-service-password arguments are required.')
                 sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
-        if args.car_service_token_url:
-            if not args.api_token:
+        if self.args.car_service_token_url:
+            if not self.args.api_token:
                 self.parser.print_usage(sys.stderr)
                 sys.stderr.write('If -car-service-url-for-token is provided then -car-service-token argument is required.')
                 sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
-        if not args.source:
+        if not self.args.source:
             self.parser.print_usage(sys.stderr)
             sys.stderr.write('Missing required -source argument.')
             sys.exit(ErrorCode.CONNECTOR_RUNTIME_INVALID_PARAMETER.value)
 
-        Context(args)
+        Context(self.args)
 
 
     def run(self):
