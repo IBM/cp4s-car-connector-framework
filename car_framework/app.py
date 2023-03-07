@@ -94,18 +94,22 @@ class BaseApp(object):
         except RecoverableFailure as e:
             context().logger.info('Recoverable failure: ' + e.message)
             context().logger.info('Incremental import will be attempted again in the next run.')
+            context().logger.info('Exit Code: ' + str(e.code))
             sys.exit(e.code)
         except UnrecoverableFailure as e:
             context().logger.info('Unrecoverable failure: ' + e.message)
             context().logger.info('Incremental import will not be possible in the next run.')
+            context().logger.info('Exit Code: ' + str(e.code))
             context().car_service.reset_model_state_id()
             sys.exit(e.code)
         except DatasourceFailure as e:
             context().logger.info('Datasource failure: ' + str(e.message))
+            context().logger.info('Exit Code: ' + str(e.code))
             sys.exit(e.code)
         except Exception as e:
             context().logger.exception(e)
             context().logger.error(traceback.format_exc())
+            context().logger.info('Unhandled Exception. Please consider to handle this error with a corresponding error code. See: https://github.com/IBM/cp4s-car-connectors/blob/develop/guide-build-connectors.md#error-handling')
             # traceback.print_exc()
             sys.exit(ErrorCode.GENERAL_APPLICATION_FAILURE.value)
 
