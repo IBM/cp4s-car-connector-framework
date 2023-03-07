@@ -128,7 +128,7 @@ def _get_conf() -> str:
 
 def _get_key_text() -> str:
     # key.jwk is in a random UUID dir
-    jwk_path = next(Path("/etc/secrets/key.jwk"))
+    jwk_path = next(Path("/etc/secrets/.jwk/key.jwk"))
     with jwk_path.open() as fp:
         key_text = fp.read()
     return key_text
@@ -148,7 +148,7 @@ def decrypt_secrets() -> dict:
             jwe_obj.decrypt(key)
             conf_decrypted[file] = jwe_obj.plaintext
 
-        return objectview(conf_decrypted)
+        return conf_decrypted
 
     except Exception:
         context().logger.exception("Error extracting secrets")

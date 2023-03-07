@@ -1,7 +1,7 @@
 import argparse, traceback, sys, os
 
 from car_framework.context import Context, context
-from car_framework.util import ErrorCode, IncrementalImportNotPossible, RecoverableFailure, UnrecoverableFailure, DatasourceFailure, decrypt_secrets
+from car_framework.util import ErrorCode, IncrementalImportNotPossible, RecoverableFailure, UnrecoverableFailure, DatasourceFailure, decrypt_secrets, objectview
 
 
 class BaseApp(object):
@@ -29,12 +29,10 @@ class BaseApp(object):
     def setup(self):
 
         file_secrets = decrypt_secrets()
+        args = vars(self.parser.parse_args())
+        args.update(file_secrets)
+        self.args = objectview(args)
 
-        if(file_secrets):
-            self.args = file_secrets
-        else:
-            args = self.parser.parse_args()
-            self.args = args
 
         if not args.api_token:
             if not args.api_key or not args.api_password:
