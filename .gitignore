@@ -79,6 +79,7 @@ celerybeat-schedule
 
 # SageMath parsed files
 *.sage.py
+*.sage.sh
 
 # Environments
 .env
@@ -98,6 +99,9 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+# IDEs
+.vscode/
 
 # mypy
 .mypy_cache/
