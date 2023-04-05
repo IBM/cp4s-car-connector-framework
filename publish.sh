@@ -21,7 +21,7 @@ else
 fi
 
 # choose repository
-if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
+if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|prod-test-*|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
     PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
     export PYPI_PACKAGE_REPOSITORY="prod"
