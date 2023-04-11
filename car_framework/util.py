@@ -128,7 +128,7 @@ def _get_conf() -> str:
 
 def _get_key_text() -> str:
     # key.jwk is in a random UUID dir
-    jwk_path = next(Path("/etc/secrets/.jwk/key.jwk"))
+    jwk_path = Path("/etc/secrets/.jwk/key.jwk")
     with jwk_path.open() as fp:
         key_text = fp.read()
     return key_text
