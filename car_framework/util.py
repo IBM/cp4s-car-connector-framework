@@ -143,14 +143,15 @@ def decrypt_secrets() -> dict:
         key_text = _get_key_text()
         key = jwk.JWK.from_json(key_text)
         conf_decrypted = {}
-        for file, encrepted_value in conf_encrypted:
-            jwe_obj = jwe.JWE.from_jose_token(encrepted_value)
+        for file in conf_encrypted:
+            jwe_obj = jwe.JWE.from_jose_token(conf_encrypted[file])
             jwe_obj.decrypt(key)
             conf_decrypted[file] = jwe_obj.plaintext
 
         return conf_decrypted
 
     except Exception:
+        from car_framework.context import context
         context().logger.exception("Error extracting secrets")
         return {}
 
