@@ -119,7 +119,7 @@ def _get_conf() -> str:
 
     conf_encrypted = {}
     for file in os.listdir(SECRET_FILE_PATH):
-        if file != "key.jwk":
+        if file != ".jwk":
             with Path(os.path.join(SECRET_FILE_PATH, file)).open() as fp:
                 encrypted_var = fp.read()
                 conf_encrypted[file] = encrypted_var
