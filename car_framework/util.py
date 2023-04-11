@@ -146,7 +146,7 @@ def decrypt_secrets() -> dict:
         for file in conf_encrypted:
             jwe_obj = jwe.JWE.from_jose_token(conf_encrypted[file])
             jwe_obj.decrypt(key)
-            conf_decrypted[file] = jwe_obj.plaintext
+            conf_decrypted[file] = jwe_obj.plaintext.decode("utf-8")
 
         return conf_decrypted
 
