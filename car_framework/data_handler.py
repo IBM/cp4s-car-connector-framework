@@ -106,7 +106,7 @@ class BaseDataHandler():
         key = '#'.join(str(x) for x in object.values())
         if not key in self.edge_keys[name]:
             object['report'] = self.report['_key']
-            object['source'] = context().args.source
+            object['source'] = context().args.CONNECTION_NAME
             object['active'] = True
             object['timestamp'] = self.report['timestamp']
             objects.append(object)

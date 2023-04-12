@@ -31,7 +31,7 @@ class CarService(object):
 
 
     def get_model_state_id(self):
-        url = 'source/%s' % (urllib.parse.quote_plus(context().args.source))
+        url = 'source/%s' % (urllib.parse.quote_plus(context().args.CONNECTION_NAME))
         resp = self.communicator.get(url)
         if resp.status_code != 200:
             return None
@@ -41,7 +41,7 @@ class CarService(object):
 
     def save_model_state_id(self, new_model_state_id):
         data = json.dumps({ MODEL_STATE_ID: new_model_state_id })
-        resp = self.communicator.patch(SOURCE_RESOURCE, data=data, params={ 'key': context().args.source })
+        resp = self.communicator.patch(SOURCE_RESOURCE, data=data, params={ 'key': context().args.CONNECTION_NAME })
         if resp.status_code != 200:
             raise Exception('Error when trying to save a save point: %d' % resp.status_code)
 
@@ -146,7 +146,7 @@ class CarService(object):
         ids_list = self.compose_paginated_list(ids)
         for page in ids_list:
 
-            url = 'source/%s/%s?%s=%s' % (context().args.source, resource, resource_key, ','.join(ids_list[page]))
+            url = 'source/%s/%s?%s=%s' % (context().args.CONNECTION_NAME, resource, resource_key, ','.join(ids_list[page]))
             r = self.communicator.delete(url)
 
             if r.status_code == 200:
@@ -284,7 +284,7 @@ class CarService(object):
 
 
     def enter_full_import_in_progress_state(self):
-        endpoint = 'source/%s%s' % (context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
+        endpoint = 'source/%s%s' % (context().args.CONNECTION_NAME, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.post(endpoint)
         job_id = self._get_job_id_from_response(r)
         self.wait_until_done(job_id)
@@ -292,7 +292,7 @@ class CarService(object):
 
 
     def exit_full_import_in_progress_state(self):
-        endpoint = 'source/%s%s' % (context().args.source, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
+        endpoint = 'source/%s%s' % (context().args.CONNECTION_NAME, FULL_IMPORT_IN_PROGRESS_ENDPOINT)
         r = self.communicator.delete(endpoint)
         job_id = self._get_job_id_from_response(r)
         self.wait_until_done(job_id)

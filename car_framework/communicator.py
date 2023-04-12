@@ -34,14 +34,14 @@ class Communicator(object):
     def __init__(self):
         self.headers = {'Accept' : 'application/json', 'Content-Type' : 'application/json'}
 
-        auth_token = context().args.api_token
+        auth_token = context().args.CAR_SERVICE_AUTHTOKEN
         if auth_token:
             self.headers['Authorization'] = 'car-token ' + auth_token
-            self.base_url = context().args.car_service_token_url
+            self.base_url = context().args.CAR_SERVICE_URL_FOR_AUTHTOKEN
             self.basic_auth = None
         else:
-            self.basic_auth = HTTPBasicAuth(context().args.api_key, context().args.api_password)
-            self.base_url = context().args.car_service_apikey_url
+            self.basic_auth = HTTPBasicAuth(context().args.CAR_SERVICE_KEY, context().args.CAR_SERVICE_PASSWORD)
+            self.base_url = context().args.CAR_SERVICE_URL
 
         if not self.base_url.endswith('/'):
             self.base_url = self.base_url + '/'
