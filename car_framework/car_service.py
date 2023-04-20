@@ -220,7 +220,7 @@ class CarService(object):
             return None
 
     def query_graphql(self, query):
-        r = self.communicator.post(GRAPH_QL, data=json.dumps({"query": query}), api_version='/api/car/v3')
+        r = self.communicator.post(GRAPH_QL, data=json.dumps({"query": query}), api_version='/v3')
         if r.status_code == 200:
             return get_json(r)
         if r.status_code == 404:
@@ -318,7 +318,7 @@ class CarService(object):
 
     def get_extension(self, key):
         endpoint = '%s/%s' % (CAR_SCHEMA, key)
-        r = self.communicator.get(endpoint, api_version='/api/car/v3')
+        r = self.communicator.get(endpoint, api_version='/v3')
         if r.status_code == 200:
             return get_json(r)
         if r.status_code == 404:
@@ -333,7 +333,7 @@ class CarService(object):
             'version': extension.version,
             'schema': json.loads(extension.schema)
         }
-        r = self.communicator.post(CAR_SCHEMA, data=json.dumps(data), api_version='/api/car/v3')
+        r = self.communicator.post(CAR_SCHEMA, data=json.dumps(data), api_version='/v3')
         if r.status_code not in (200, 201):
             raise Exception('Error when posting schema extension: %d' % r.status_code)
 

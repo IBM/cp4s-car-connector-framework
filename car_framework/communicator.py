@@ -7,7 +7,7 @@ from requests.packages.urllib3.util.retry import Retry
 from car_framework.util import get_json
 from car_framework.context import context
 
-default_api_version = '/api/car/v2'
+default_api_version = '/v2'
 
 class Response(object):
     def __init__(self, sc, data):
