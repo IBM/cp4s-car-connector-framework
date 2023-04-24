@@ -150,9 +150,9 @@ def decrypt_secrets() -> dict:
 
             ###### Delete this before release ########
             from car_framework.context import context
-            context().logger.info(file)
-            context().logger.info("encrypt:" + conf_encrypted[file])
-            context().logger.info("encrypt:" + conf_decrypted[file])
+            print(file)
+            print("encrypt:" + conf_encrypted[file])
+            print("encrypt:" + conf_decrypted[file])
             ##########################################
 
         return conf_decrypted

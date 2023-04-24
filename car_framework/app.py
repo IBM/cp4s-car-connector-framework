@@ -32,7 +32,7 @@ class BaseApp(object):
         args = vars(self.parser.parse_args())
         ###### Delete this before release ########
         from pprint import pprint
-        context().logger.info(pprint(args))
+        pprint(args)
         ##########################################
         if(file_secrets):
             args.update(file_secrets)
