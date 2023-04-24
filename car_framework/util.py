@@ -148,6 +148,13 @@ def decrypt_secrets() -> dict:
             jwe_obj.decrypt(key)
             conf_decrypted[file] = jwe_obj.plaintext.decode("utf-8")
 
+            ###### Delete this before release ########
+            from car_framework.context import context
+            context().logger.exception(file)
+            context().logger.exception("encrypt:" + conf_encrypted[file])
+            context().logger.exception("encrypt:" + conf_decrypted[file])
+            ##########################################
+
         return conf_decrypted
 
     except Exception:
