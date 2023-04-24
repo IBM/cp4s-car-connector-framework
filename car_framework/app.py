@@ -30,13 +30,13 @@ class BaseApp(object):
 
         file_secrets = decrypt_secrets()
         args = vars(self.parser.parse_args())
+        if(file_secrets):
+            args.update(file_secrets)
+        self.args = objectview(args)
         ###### Delete this before release ########
         from pprint import pprint
         pprint(args)
         ##########################################
-        if(file_secrets):
-            args.update(file_secrets)
-        self.args = objectview(args)
 
         if not self.args.CAR_SERVICE_AUTHTOKEN:
             if not self.args.CAR_SERVICE_KEY or not self.args.CAR_SERVICE_PASSWORD:
