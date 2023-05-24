@@ -19,15 +19,15 @@ def context_patch():
 
     context_args = {
         'car_service': 'https://example.com/api/car/v2',
-        'api_key': None,
-        'api_password': 'abc-xyz',
-        'car_service_token_url': 'abc-xyz',
-        'api_token': 'abc-xyz',
-        'source': 'AWS-TEST',
+        'CAR_SERVICE_KEY': None,
+        'CAR_SERVICE_PASSWORD': 'abc-xyz',
+        'CAR_SERVICE_URL_FOR_AUTHTOKEN': 'abc-xyz',
+        'CAR_SERVICE_AUTHTOKEN': 'abc-xyz',
+        'CONNECTION_NAME': 'AWS-TEST',
         'debug': False,
         'last_model_state_id': "1580649320000",
         'current_time': "1580649321920",
-        'connector_name': "test-connector-name",
+        'CONNECTOR_NAME': "test-connector-name",
         'export_data_dir': "./cache",
         'export_data_page_size': 20,
         'version': 1
