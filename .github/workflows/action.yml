@@ -18,7 +18,7 @@ jobs:
       with:
         python-version: "3.10"
     - name: Install dependencies
-      run: apt-get install expect-dev
+      run: sudo apt-get install -y expect-dev
     - name: Run unit test
       run: bash ./run_unit_tests.sh
     - name: Publish
