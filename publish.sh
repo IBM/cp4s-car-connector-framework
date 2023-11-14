@@ -20,7 +20,10 @@ else
     EFFECTIVE_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH}"
 fi
 
-echo "PYPI repo ${{ PYPI_API_REPOSITORY_PROD }}"
+echo "PYPI repo $PYPI_API_REPOSITORY_PROD }}"
+echo "PYPI repo ${{ env.PYPI_API_REPOSITORY_PROD }}"
+echo "PYPI repo ${{ vars.PYPI_API_REPOSITORY_PROD }}"
+
 # choose repository
 if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|prod-test-.*|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
     PYPI_API_REPOSITORY="${vars.PYPI_API_REPOSITORY_PROD}"

@@ -22,7 +22,5 @@ jobs:
     - name: Run unit test
       run: bash ./run_unit_tests.sh
     - name: Publish
-      env:
-        PYPI_API_REPOSITORY_PROD: ${{ vars.PYPI_API_REPOSITORY_PROD }}
       run: unbuffer bash ./publish.sh
 
