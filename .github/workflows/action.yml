@@ -22,5 +22,7 @@ jobs:
     - name: Run unit test
       run: bash ./run_unit_tests.sh
     - name: Publish
+      env:
+        PYPI_API_REPOSITORY_PROD: 'https://upload.pypi.org/legacy/'
       run: unbuffer bash ./publish.sh
 
