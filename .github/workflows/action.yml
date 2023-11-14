@@ -29,6 +29,6 @@ jobs:
         PYPI_API_TOKEN_TEST: ${{ secrets.PYPI_API_TOKEN_TEST }}
         EFFECTIVE_BRANCH: ${{ github.head_ref || github.ref_name }}
         RUN_ID: ${{ github.run_id }}
-        VERSION_LAST_TAG: $(git describe --abbrev=0 --tags 2>/dev/null)
+        VERSION_LAST_TAG: ${{ git describe --abbrev=0 --tags 2>/dev/null }}
       run: unbuffer bash ./publish.sh
 
