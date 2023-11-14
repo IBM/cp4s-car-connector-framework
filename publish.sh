@@ -20,9 +20,6 @@ else
     EFFECTIVE_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH}"
 fi
 
-    echo "Token: $PYPI_API_TOKEN_PROD"
-    echo "Repo: $PYPI_API_REPOSITORY_PROD"
-
 # choose repository
 if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|prod-test-.*|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
     PYPI_API_REPOSITORY="${vars.PYPI_API_REPOSITORY_PROD}"
@@ -36,6 +33,7 @@ fi
 
 # export version
 VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
+log "Version tag: $VERSION_LAST_TAG"
 
 if [ -z "$TRAVIS_TAG" ]; then
     export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${TRAVIS_BUILD_NUMBER}
