@@ -29,6 +29,7 @@ if [[ "${EFFECTIVE_BRANCH}" =~ ^(v[0-9]+(\.[0-9]+){0,4})$ ]]; then
 else
     # export version
     log "Version tag: $VERSION_LAST_TAG"
+    git --version
     git describe --abbrev=0 --tags 2>/dev/null
     VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
     log "Version tag: $VERSION_LAST_TAG"
