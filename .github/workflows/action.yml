@@ -24,5 +24,6 @@ jobs:
     - name: Publish
       env:
         PYPI_API_REPOSITORY_PROD: 'https://upload.pypi.org/legacy/'
+        PYPI_API_TOKEN_PROD: ${{ secrets.PYPI_API_TOKEN_PROD }}
       run: unbuffer bash ./publish.sh
 

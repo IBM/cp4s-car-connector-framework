@@ -20,18 +20,14 @@ else
     EFFECTIVE_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH}"
 fi
 
-echo "PYPI repo $PYPI_API_REPOSITORY_PROD }}"
-echo "PYPI repo ${{ env.PYPI_API_REPOSITORY_PROD }}"
-echo "PYPI repo ${{ vars.PYPI_API_REPOSITORY_PROD }}"
-
 # choose repository
 if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|prod-test-.*|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
     PYPI_API_REPOSITORY="${vars.PYPI_API_REPOSITORY_PROD}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
     export PYPI_PACKAGE_REPOSITORY="prod"
 else
-    PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_TEST}"
-    PYPI_API_TOKEN="${PYPI_API_TOKEN_TEST}"
+    PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
+    PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
     export PYPI_PACKAGE_REPOSITORY="test"
 fi
 
@@ -57,8 +53,6 @@ if [ "${TO_PUBLISH}" == "true" ] ; then
 
     log "Running setup.py"
     python setup.py sdist bdist_wheel
-
-    echo "PYPI repo ${PYPI_API_REPOSITORY}"
 
     python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi
