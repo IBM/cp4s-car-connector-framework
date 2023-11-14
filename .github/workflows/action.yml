@@ -21,9 +21,6 @@ jobs:
       run: sudo apt-get install -y expect-dev
     - name: Run unit test
       run: bash ./run_unit_tests.sh
-    - name: 'Get Previous tag'
-      id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@v1"
     - name: Publish
       env:
         PYPI_API_REPOSITORY_PROD: 'https://upload.pypi.org/legacy/'
@@ -32,6 +29,6 @@ jobs:
         PYPI_API_TOKEN_TEST: ${{ secrets.PYPI_API_TOKEN_TEST }}
         EFFECTIVE_BRANCH: ${{ github.head_ref || github.ref_name }}
         RUN_NUMBER: ${{ github.GITHUB_RUN_NUMBER }}
-        VERSION_LAST_TAG: ${{ steps.previoustag.outputs.tag }}
+        VERSION_LAST_TAG: echo $(git describe --abbrev=0 --tags 2>/dev/null)
       run: unbuffer bash ./publish.sh
 
