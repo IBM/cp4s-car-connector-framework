@@ -12,17 +12,9 @@ if [ -z "${TO_PUBLISH}" ]; then
     TO_PUBLISH="true"
 fi
 
-
-# get branch
-if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
-    EFFECTIVE_BRANCH="${TRAVIS_BRANCH}"
-else
-    EFFECTIVE_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH}"
-fi
-
 # choose repository
 if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|prod-test-.*|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
-    PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
+    PYPI_API_REPOSITORY="${vars.PYPI_API_REPOSITORY_PROD}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
     export PYPI_PACKAGE_REPOSITORY="prod"
 else
@@ -33,11 +25,13 @@ fi
 
 # export version
 VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
+log "Version tag: $VERSION_LAST_TAG"
+log "Run id: ${{ github.run_id }}"
 
-if [ -z "$TRAVIS_TAG" ]; then
-    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${TRAVIS_BUILD_NUMBER}
+if [ -z "${{ github.ref }}" ]; then
+    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${github.run_id}
 else 
-    export PYPI_PACKAGE_VERSION=${TRAVIS_TAG}
+    export PYPI_PACKAGE_VERSION=${github.ref}
 fi
 
 log "EFFECTIVE_BRANCH: ${EFFECTIVE_BRANCH}"
@@ -51,7 +45,11 @@ if [ "${TO_PUBLISH}" == "true" ] ; then
 
     rm -R -f ./build ./dist ./*.egg-info
 
+    log "Running setup.py"
     python setup.py sdist bdist_wheel
 
-    python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
+    echo "Token: $PYPI_API_TOKEN"
+    echo "Repo: $PYPI_API_REPOSITORY"
+
+    python -m twine upload -u "__token__" -p "test${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi
