@@ -28,9 +28,10 @@ if [[ "${EFFECTIVE_BRANCH}" =~ ^(v[0-9]+(\.[0-9]+){0,4})$ ]]; then
     export PYPI_PACKAGE_VERSION=${EFFECTIVE_BRANCH}
 else
     # export version
+    git describe --abbrev=0 --tags 2>/dev/null
     VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
     log "Version tag: $VERSION_LAST_TAG"
-    log "Run id: ${{ github.run_id }}"
+    log "Run id: $RUN_ID"
 
     export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${RUN_ID}
 fi
@@ -48,9 +49,6 @@ if [ "${TO_PUBLISH}" == "true" ] ; then
 
     log "Running setup.py"
     python setup.py sdist bdist_wheel
-
-    echo "Token: $PYPI_API_TOKEN"
-    echo "Repo: $PYPI_API_REPOSITORY"
 
     python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi
