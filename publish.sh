@@ -51,9 +51,10 @@ if [ "${TO_PUBLISH}" == "true" ] ; then
 
     rm -R -f ./build ./dist ./*.egg-info
 
+    log "Running setup.py"
     python setup.py sdist bdist_wheel
 
-    echo ${PYPI_API_REPOSITORY}
+    log "PYPI repo ${PYPI_API_REPOSITORY}"
 
     python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi
