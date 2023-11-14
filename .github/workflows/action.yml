@@ -25,5 +25,8 @@ jobs:
       env:
         PYPI_API_REPOSITORY_PROD: 'https://upload.pypi.org/legacy/'
         PYPI_API_TOKEN_PROD: ${{ secrets.PYPI_API_TOKEN_PROD }}
+        PYPI_API_REPOSITORY_TEST: 'https://test.pypi.org/legacy/'
+        PYPI_API_TOKEN_TEST: ${{ secrets.PYPI_API_TOKEN_PROD }}
+        EFFECTIVE_BRANCH: ${{ github.head_ref || github.ref_name }}
       run: unbuffer bash ./publish.sh
 

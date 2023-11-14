@@ -12,14 +12,6 @@ if [ -z "${TO_PUBLISH}" ]; then
     TO_PUBLISH="true"
 fi
 
-
-# get branch
-if [ -z "${{ github.base_ref }}" ]; then
-    EFFECTIVE_BRANCH="${{ github.ref }}"
-else
-    EFFECTIVE_BRANCH="${{ github.base_ref }}"
-fi
-
 # choose repository
 if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|prod-test-.*|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
     PYPI_API_REPOSITORY="${vars.PYPI_API_REPOSITORY_PROD}"
@@ -59,5 +51,5 @@ if [ "${TO_PUBLISH}" == "true" ] ; then
     echo "Token: $PYPI_API_TOKEN"
     echo "Repo: $PYPI_API_REPOSITORY"
 
-    python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
+    python -m twine upload -u "__token__" -p "test${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi
