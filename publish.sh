@@ -14,10 +14,10 @@ fi
 
 
 # get branch
-if [ -z "$TRAVIS_PULL_REQUEST_BRANCH" ]; then
-    EFFECTIVE_BRANCH="${TRAVIS_BRANCH}"
+if [ -z "${{ github.base_ref }}" ]; then
+    EFFECTIVE_BRANCH="${{ github.ref }}"
 else
-    EFFECTIVE_BRANCH="${TRAVIS_PULL_REQUEST_BRANCH}"
+    EFFECTIVE_BRANCH="${{ github.base_ref }}"
 fi
 
 # choose repository
@@ -34,11 +34,12 @@ fi
 # export version
 VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
 log "Version tag: $VERSION_LAST_TAG"
+log "Run id: ${{ github.run_id }}"
 
-if [ -z "$TRAVIS_TAG" ]; then
-    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${TRAVIS_BUILD_NUMBER}
+if [ -z "${{ github.ref }}" ]; then
+    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${github.run_id}
 else 
-    export PYPI_PACKAGE_VERSION=${TRAVIS_TAG}
+    export PYPI_PACKAGE_VERSION=${github.ref}
 fi
 
 log "EFFECTIVE_BRANCH: ${EFFECTIVE_BRANCH}"
