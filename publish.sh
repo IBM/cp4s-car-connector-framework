@@ -32,9 +32,9 @@ else
     git describe --abbrev=0 --tags 2>/dev/null
     VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
     log "Version tag: $VERSION_LAST_TAG"
-    log "Run id: $RUN_ID"
+    log "Run number: $RUN_NUMBER"
 
-    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${RUN_ID}
+    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${RUN_NUMBER}
 fi
 
 log "EFFECTIVE_BRANCH: ${EFFECTIVE_BRANCH}"

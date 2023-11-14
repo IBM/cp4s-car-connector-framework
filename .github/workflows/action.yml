@@ -21,11 +21,6 @@ jobs:
       run: sudo apt-get install -y expect-dev
     - name: Run unit test
       run: bash ./run_unit_tests.sh
-    - name: setup git config
-        run: |
-          # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
     - name: Publish
       env:
         PYPI_API_REPOSITORY_PROD: 'https://upload.pypi.org/legacy/'
@@ -33,7 +28,7 @@ jobs:
         PYPI_API_REPOSITORY_TEST: 'https://test.pypi.org/legacy/'
         PYPI_API_TOKEN_TEST: ${{ secrets.PYPI_API_TOKEN_TEST }}
         EFFECTIVE_BRANCH: ${{ github.head_ref || github.ref_name }}
-        RUN_ID: ${{ github.run_id }}
-        VERSION_LAST_TAG: ${{ git describe --abbrev=0 --tags 2>/dev/null }}
+        RUN_NUMBER: ${{ github.GITHUB_RUN_NUMBER }}
+        VERSION_LAST_TAG: echo $(git describe --abbrev=0 --tags 2>/dev/null)
       run: unbuffer bash ./publish.sh
 
