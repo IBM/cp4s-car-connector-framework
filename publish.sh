@@ -14,7 +14,7 @@ fi
 
 # choose repository
 if [[ "${EFFECTIVE_BRANCH}" =~ ^(develop|master|prod-test-.*|v[0-9]+(\.[0-9]+){0,4})$ ]]; then
-    PYPI_API_REPOSITORY="${vars.PYPI_API_REPOSITORY_PROD}"
+    PYPI_API_REPOSITORY="${PYPI_API_REPOSITORY_PROD}"
     PYPI_API_TOKEN="${PYPI_API_TOKEN_PROD}"
     export PYPI_PACKAGE_REPOSITORY="prod"
 else
@@ -23,15 +23,16 @@ else
     export PYPI_PACKAGE_REPOSITORY="test"
 fi
 
-# export version
-VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
-log "Version tag: $VERSION_LAST_TAG"
-log "Run id: ${{ github.run_id }}"
 
-if [ -z "${{ github.ref }}" ]; then
-    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${github.run_id}
-else 
-    export PYPI_PACKAGE_VERSION=${github.ref}
+if [[ "${EFFECTIVE_BRANCH}" =~ ^(v[0-9]+(\.[0-9]+){0,4})$ ]]; then
+    export PYPI_PACKAGE_VERSION=${EFFECTIVE_BRANCH}
+else
+    # export version
+    VERSION_LAST_TAG=$(git describe --abbrev=0 --tags 2>/dev/null)
+    log "Version tag: $VERSION_LAST_TAG"
+    log "Run id: ${{ github.run_id }}"
+
+    export PYPI_PACKAGE_VERSION=${VERSION_LAST_TAG}-rc.${RUN_ID}
 fi
 
 log "EFFECTIVE_BRANCH: ${EFFECTIVE_BRANCH}"
@@ -51,5 +52,5 @@ if [ "${TO_PUBLISH}" == "true" ] ; then
     echo "Token: $PYPI_API_TOKEN"
     echo "Repo: $PYPI_API_REPOSITORY"
 
-    python -m twine upload -u "__token__" -p "test${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
+    python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
 fi

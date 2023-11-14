@@ -28,5 +28,6 @@ jobs:
         PYPI_API_REPOSITORY_TEST: 'https://test.pypi.org/legacy/'
         PYPI_API_TOKEN_TEST: ${{ secrets.PYPI_API_TOKEN_PROD }}
         EFFECTIVE_BRANCH: ${{ github.head_ref || github.ref_name }}
+        RUN_ID: ${{ github.run_id }}
       run: unbuffer bash ./publish.sh
 
