@@ -1,0 +1,33 @@
+name: Unit test and Publish
+on:
+  push:
+    branches: '**'
+  pull_request:
+    branches: [ "develop" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.9"
+    - name: Install dependencies
+      run: sudo apt-get install -y expect-dev
+    - name: Run unit test
+      run: bash ./run_unit_tests.sh
+    - name: Publish
+      env:
+        PYPI_API_REPOSITORY_PROD: 'https://upload.pypi.org/legacy/'
+        PYPI_API_TOKEN_PROD: ${{ secrets.PYPI_API_TOKEN_PROD }}
+        PYPI_API_REPOSITORY_TEST: 'https://test.pypi.org/legacy/'
+        PYPI_API_TOKEN_TEST: ${{ secrets.PYPI_API_TOKEN_TEST }}
+        EFFECTIVE_BRANCH: ${{ github.head_ref || github.ref_name }}
+        RUN_NUMBER: ${{ github.run_number }}
+      run: unbuffer bash ./publish.sh
+
