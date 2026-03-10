@@ -1,29 +1,33 @@
 import logging
-from pythonjsonlogger import jsonlogger
-from datetime import datetime
+from pythonjsonlogger import json as jsonlogger
+from datetime import datetime, timezone
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
-        # use inherited constructor
-        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        if log_record is None:
+            log_record = {}
+
+        super().add_fields(log_record, record, message_dict)
 
         if not log_record.get('ibm_datetime'):
-            now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-            log_record['ibm_datetime'] = now
-        
-        if not log_record.get('connector') and context().args.CONNECTOR_NAME:
-            log_record['connector'] = context().args.CONNECTOR_NAME
-        
-        if not log_record.get('source') and context().args.CONNECTION_NAME:
-            log_record['source'] = context().args.CONNECTION_NAME
-        
-        if not log_record.get('version') and context().args.CONNECTOR_VERSION:
-            log_record['version'] = context().args.CONNECTOR_VERSION
+            log_record['ibm_datetime'] = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
-        # assign values to log_record
-        log_record['level'] = log_record['level'].lower() if log_record.get('level') else record.levelname
-        log_record['message'] = log_record['message'] if log_record.get('log') else record.message
-        log_record['label'] = log_record['label'] if log_record.get('type') else record.name
+        args = context().args if context() else None
+
+        if args:
+            if not log_record.get('connector') and getattr(args, "CONNECTOR_NAME", None):
+                log_record['connector'] = args.CONNECTOR_NAME
+
+            if not log_record.get('source') and getattr(args, "CONNECTION_NAME", None):
+                log_record['source'] = args.CONNECTION_NAME
+
+            if not log_record.get('version') and getattr(args, "CONNECTOR_VERSION", None):
+                log_record['version'] = args.CONNECTOR_VERSION
+
+        # safe assignment
+        log_record['level'] = (log_record.get('level') or record.levelname or "").lower()
+        log_record['message'] = log_record.get('message') or record.getMessage()
+        log_record['label'] = log_record.get('label') or record.name
 
 def create_logger(debug = False):
     logger = logging.getLogger()

@@ -2,7 +2,7 @@ import requests, os
 from requests.exceptions import ConnectionError, ConnectTimeout, RetryError
 from requests.auth import HTTPBasicAuth
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util.retry import Retry
 
 from car_framework.util import get_json
 from car_framework.context import context
