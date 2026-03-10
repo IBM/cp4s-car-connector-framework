@@ -42,13 +42,18 @@ log "PYPI_PACKAGE_REPOSITORY: ${PYPI_PACKAGE_REPOSITORY}"
 if [ "${TO_PUBLISH}" == "true" ] ; then
     log "START PUBLISHING"
 
-    pip install setuptools wheel twine keyring==21.4.0
+    pip install --upgrade build twine keyring
+    rm -rf ./build ./dist ./car_connector_framework.egg-info
 
-    rm -R -f ./build ./dist ./*.egg-info
+    log "Retrieving version"
+    sed -i.bak "s/__version__ = .*/__version__ = \"${PYPI_PACKAGE_VERSION}\"/" car_framework/__init__.py
 
-    log "Running setup.py"
-    python setup.py sdist bdist_wheel
+    log "Building packages"
+    python -m build
 
-    log "Uploading Pypi"
+    log "Uploading to PyPI"
     python -m twine upload -u "__token__" -p "${PYPI_API_TOKEN}" --repository-url "${PYPI_API_REPOSITORY}" dist/*
+
+    log "Cleanup build"
+    rm -rf ./build ./dist ./car_connector_framework.egg-info
 fi
